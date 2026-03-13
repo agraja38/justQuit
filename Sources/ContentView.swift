@@ -60,6 +60,26 @@ struct ContentView: View {
                         if model.countdownEnabled {
                             Stepper("Countdown seconds: \(model.countdownSeconds)", value: $model.countdownSeconds, in: 1 ... 30)
                         }
+
+                        Picker("Menu bar icon style", selection: $model.menuBarIconStyle) {
+                            ForEach(MenuBarIconStyle.allCases) { style in
+                                Text(style.title).tag(style)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+
+                GroupBox("Recent Session Restore") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(model.lastRestoreSummaryText)
+                            .foregroundStyle(.secondary)
+
+                        Button("Restore Last Session") {
+                            model.restoreLastSession()
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(model.lastRestoreSession == nil)
                     }
                     .padding(.vertical, 8)
                 }
@@ -220,6 +240,12 @@ struct ContentView: View {
                     model.refreshApps()
                 }
                 .buttonStyle(.bordered)
+
+                Button("Restore Last Session") {
+                    model.restoreLastSession()
+                }
+                .buttonStyle(.bordered)
+                .disabled(model.lastRestoreSession == nil)
 
                 Spacer()
 

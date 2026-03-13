@@ -87,6 +87,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self?.applyLaunchAtLogin(enabled)
             }
             .store(in: &settingsCancellables)
+
+        model.$menuBarIconStyle
+            .sink { [weak self] style in
+                self?.statusBarController?.applyIconStyle(style)
+            }
+            .store(in: &settingsCancellables)
     }
 
     private func applyLaunchAtLogin(_ enabled: Bool) {
@@ -313,6 +319,10 @@ private final class StatusBarController: NSObject {
         model.refreshApps()
     }
 
+    @objc private func restoreLastSessionFromMenu() {
+        model.restoreLastSession()
+    }
+
     @objc private func toggleQuickProtection(_ sender: NSMenuItem) {
         guard let app = sender.representedObject as? RunningAppInfo else { return }
         model.toggleProtection(for: app)
@@ -330,19 +340,36 @@ private final class StatusBarController: NSObject {
     private func configureStatusItem() {
         guard let button = statusItem.button else { return }
 
-        button.attributedTitle = title(for: "Q")
         button.toolTip = "justQuit: left click quits eligible apps. Right click for more options."
         button.target = self
         button.action = #selector(handleStatusItemClick)
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        applyIconStyle(model.menuBarIconStyle)
     }
 
     func setCountdownDisplay(seconds: Int) {
-        statusItem.button?.attributedTitle = title(for: "\(seconds)")
+        statusItem.button?.image = nil
+        statusItem.button?.attributedTitle = title(for: "\(seconds)", weight: .bold)
     }
 
     func clearCountdownDisplay() {
-        statusItem.button?.attributedTitle = title(for: "Q")
+        applyIconStyle(model.menuBarIconStyle)
+    }
+
+    func applyIconStyle(_ style: MenuBarIconStyle) {
+        guard let button = statusItem.button else { return }
+
+        button.image = nil
+        button.attributedTitle = NSAttributedString(string: "")
+
+        switch style {
+        case .classicQ:
+            button.attributedTitle = title(for: "Q", weight: .bold)
+        case .badgeQ:
+            button.image = badgeImage(text: "Q")
+        case .compactJQ:
+            button.attributedTitle = title(for: "JQ", weight: .bold)
+        }
     }
 
     private func showContextMenu() {
@@ -359,6 +386,9 @@ private final class StatusBarController: NSObject {
         menu.addItem(quitAllItem)
         menu.addItem(NSMenuItem(title: "Cancel Countdown", action: #selector(cancelCountdownFromMenu), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Refresh Apps", action: #selector(refreshAppsFromMenu), keyEquivalent: ""))
+        let restoreItem = NSMenuItem(title: "Restore Last Session", action: #selector(restoreLastSessionFromMenu), keyEquivalent: "")
+        restoreItem.isEnabled = model.lastRestoreSession != nil
+        menu.addItem(restoreItem)
 
         if !model.profiles.isEmpty {
             let profilesMenu = NSMenu()
@@ -396,11 +426,36 @@ private final class StatusBarController: NSObject {
         statusItem.menu = nil
     }
 
-    private func title(for text: String) -> NSAttributedString {
+    private func title(for text: String, weight: NSFont.Weight) -> NSAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 15, weight: .bold),
+            .font: NSFont.systemFont(ofSize: 15, weight: weight),
             .foregroundColor: NSColor.labelColor
         ]
         return NSAttributedString(string: text, attributes: attributes)
+    }
+
+    private func badgeImage(text: String) -> NSImage {
+        let size = NSSize(width: 18, height: 18)
+        let image = NSImage(size: size)
+        image.lockFocus()
+
+        let circleRect = NSRect(x: 1, y: 1, width: 16, height: 16)
+        NSColor.labelColor.setFill()
+        NSBezierPath(ovalIn: circleRect).fill()
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: 11, weight: .bold),
+            .foregroundColor: NSColor.controlBackgroundColor,
+            .paragraphStyle: paragraphStyle
+        ]
+
+        let textRect = NSRect(x: 0, y: 2, width: size.width, height: 12)
+        text.draw(in: textRect, withAttributes: attributes)
+        image.unlockFocus()
+        image.isTemplate = false
+        return image
     }
 }

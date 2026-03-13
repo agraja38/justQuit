@@ -1,8 +1,8 @@
 {
-  "version": "1.2",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2",
+  "version": "1.2.01",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.01/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.01",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 989884,
-  "notes": "Updates now run in the background with a cleaner Settings view, latest-version messaging, visible update size, and a simpler Update Now flow."
+  "sizeBytes": 1040768,
+  "notes": "Adds menu bar icon style choices and a recent session restore button so you can bring back the apps from your last justQuit cleanup."
 }

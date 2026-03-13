@@ -37,11 +37,13 @@ struct ExportedSettings: Codable {
     let notificationsEnabled: Bool
     let hotkeyEnabled: Bool
     let launchAtLoginEnabled: Bool
+    let menuBarIconStyleRawValue: String?
     let updateFeedURLString: String?
 }
 
 struct QuitSummary {
     let targetNames: [String]
+    let targetBundleIdentifiers: [String]
 
     var count: Int {
         targetNames.count
@@ -61,6 +63,35 @@ struct UpdateFeed: Codable, Equatable {
     let sizeBytes: Int64?
 }
 
+struct RestoreSession: Codable, Equatable {
+    let bundleIdentifiers: [String]
+    let appNames: [String]
+    let createdAt: Date
+
+    var count: Int {
+        bundleIdentifiers.count
+    }
+}
+
+enum MenuBarIconStyle: String, Codable, CaseIterable, Identifiable {
+    case classicQ
+    case badgeQ
+    case compactJQ
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .classicQ:
+            return "Classic Q"
+        case .badgeQ:
+            return "Badge Q"
+        case .compactJQ:
+            return "Compact JQ"
+        }
+    }
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     private static let builtInUpdateFeedURLString = "https://raw.githubusercontent.com/agraja38/justQuit/main/docs/update.json"
@@ -78,6 +109,7 @@ final class AppModel: ObservableObject {
     @Published var notificationsEnabled = true { didSet { persist() } }
     @Published var hotkeyEnabled = false { didSet { persist() } }
     @Published var launchAtLoginEnabled = false { didSet { persist() } }
+    @Published var menuBarIconStyle: MenuBarIconStyle = .classicQ { didSet { persist() } }
     @Published var firstRunCompleted = false { didSet { persist() } }
 
     @Published var statusMessage = "Ready"
@@ -88,6 +120,7 @@ final class AppModel: ObservableObject {
     @Published var isInstallingUpdate = false
     @Published var isCheckingForUpdates = false
     @Published var hasCheckedForUpdates = false
+    @Published private(set) var lastRestoreSession: RestoreSession?
 
     private let workspace = NSWorkspace.shared
     private let defaultsPrefix = "justQuit."
@@ -150,6 +183,17 @@ final class AppModel: ObservableObject {
         return ByteCountFormatter.string(fromByteCount: availableUpdateSizeBytes, countStyle: .file)
     }
 
+    var lastRestoreSummaryText: String {
+        guard let lastRestoreSession else {
+            return "No recent session yet."
+        }
+
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full
+        let timeText = formatter.localizedString(for: lastRestoreSession.createdAt, relativeTo: Date())
+        return "\(lastRestoreSession.count) app(s) saved from \(timeText)."
+    }
+
     func shouldQuit(_ app: RunningAppInfo) -> Bool {
         if app.isMenuBarOrBackgroundApp {
             return includedBackgroundBundleIdentifiers.contains(app.bundleIdentifier)
@@ -209,7 +253,10 @@ final class AppModel: ObservableObject {
             return nil
         }
 
-        return QuitSummary(targetNames: targets.map(\.name))
+        return QuitSummary(
+            targetNames: targets.map(\.name),
+            targetBundleIdentifiers: targets.map(\.bundleIdentifier)
+        )
     }
 
     func performQuitAll() -> QuitSummary? {
@@ -226,13 +273,48 @@ final class AppModel: ObservableObject {
                 .terminate()
         }
 
+        lastRestoreSession = RestoreSession(
+            bundleIdentifiers: targets.map(\.bundleIdentifier),
+            appNames: targets.map(\.name),
+            createdAt: Date()
+        )
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
             self?.refreshApps()
         }
 
-        let summary = QuitSummary(targetNames: targets.map(\.name))
+        let summary = QuitSummary(
+            targetNames: targets.map(\.name),
+            targetBundleIdentifiers: targets.map(\.bundleIdentifier)
+        )
         statusMessage = summary.message
         return summary
+    }
+
+    func restoreLastSession() {
+        guard let lastRestoreSession, !lastRestoreSession.bundleIdentifiers.isEmpty else {
+            statusMessage = "No recent session to restore."
+            return
+        }
+
+        var reopenedCount = 0
+        for bundleIdentifier in lastRestoreSession.bundleIdentifiers {
+            guard let appURL = workspace.urlForApplication(withBundleIdentifier: bundleIdentifier) else {
+                continue
+            }
+
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = false
+
+            workspace.openApplication(at: appURL, configuration: configuration)
+            reopenedCount += 1
+        }
+
+        if reopenedCount == 0 {
+            statusMessage = "Could not restore the recent session."
+        } else {
+            statusMessage = "Restored \(reopenedCount) app(s)."
+        }
     }
 
     func shouldAskForConfirmation(appCount: Int) -> Bool {
@@ -282,6 +364,7 @@ final class AppModel: ObservableObject {
             notificationsEnabled: notificationsEnabled,
             hotkeyEnabled: hotkeyEnabled,
             launchAtLoginEnabled: launchAtLoginEnabled,
+            menuBarIconStyleRawValue: menuBarIconStyle.rawValue,
             updateFeedURLString: nil
         )
 
@@ -304,6 +387,10 @@ final class AppModel: ObservableObject {
         notificationsEnabled = payload.notificationsEnabled
         hotkeyEnabled = payload.hotkeyEnabled
         launchAtLoginEnabled = payload.launchAtLoginEnabled
+        if let rawValue = payload.menuBarIconStyleRawValue,
+           let importedStyle = MenuBarIconStyle(rawValue: rawValue) {
+            menuBarIconStyle = importedStyle
+        }
 
         statusMessage = "Imported settings."
     }
@@ -375,11 +462,20 @@ final class AppModel: ObservableObject {
         notificationsEnabled = defaults.object(forKey: key("notificationsEnabled")) as? Bool ?? true
         hotkeyEnabled = defaults.object(forKey: key("hotkeyEnabled")) as? Bool ?? false
         launchAtLoginEnabled = defaults.object(forKey: key("launchAtLoginEnabled")) as? Bool ?? false
+        if let rawValue = defaults.string(forKey: key("menuBarIconStyle")),
+           let storedStyle = MenuBarIconStyle(rawValue: rawValue) {
+            menuBarIconStyle = storedStyle
+        }
         firstRunCompleted = defaults.object(forKey: key("firstRunCompleted")) as? Bool ?? false
 
         if let profilesData = defaults.data(forKey: key("profiles")),
            let decodedProfiles = try? JSONDecoder().decode([QuitProfile].self, from: profilesData) {
             profiles = decodedProfiles
+        }
+
+        if let restoreData = defaults.data(forKey: key("lastRestoreSession")),
+           let decodedSession = try? JSONDecoder().decode(RestoreSession.self, from: restoreData) {
+            lastRestoreSession = decodedSession
         }
     }
 
@@ -396,10 +492,15 @@ final class AppModel: ObservableObject {
         defaults.set(notificationsEnabled, forKey: key("notificationsEnabled"))
         defaults.set(hotkeyEnabled, forKey: key("hotkeyEnabled"))
         defaults.set(launchAtLoginEnabled, forKey: key("launchAtLoginEnabled"))
+        defaults.set(menuBarIconStyle.rawValue, forKey: key("menuBarIconStyle"))
         defaults.set(firstRunCompleted, forKey: key("firstRunCompleted"))
 
         if let profilesData = try? JSONEncoder().encode(profiles) {
             defaults.set(profilesData, forKey: key("profiles"))
+        }
+
+        if let restoreData = try? JSONEncoder().encode(lastRestoreSession) {
+            defaults.set(restoreData, forKey: key("lastRestoreSession"))
         }
     }
 
