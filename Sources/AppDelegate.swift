@@ -39,10 +39,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         bindSettings()
 
-        if !model.updateFeedURLString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            Task {
-                await model.checkForUpdates(silent: true)
-            }
+        Task {
+            await model.checkForUpdates(silent: true)
         }
 
         if !model.firstRunCompleted {

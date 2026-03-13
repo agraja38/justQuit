@@ -66,12 +66,6 @@ struct ContentView: View {
 
                 GroupBox("Updates") {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Update Feed URL")
-                            .font(.headline)
-
-                        TextField("https://example.com/justQuit-update.json", text: $model.updateFeedURLString)
-                            .textFieldStyle(.roundedBorder)
-
                         HStack(spacing: 12) {
                             Button("Check for Updates") {
                                 Task {
@@ -79,15 +73,21 @@ struct ContentView: View {
                                 }
                             }
                             .buttonStyle(.borderedProminent)
+                            .disabled(model.isCheckingForUpdates || model.isInstallingUpdate)
 
-                            Text("Current version: \(model.currentVersion)")
+                            Text(model.updateStatusText)
                                 .foregroundStyle(.secondary)
                         }
 
                         if let availableUpdate = model.availableUpdate {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Update \(availableUpdate.version) is available")
+                                Text("New version available: \(availableUpdate.version)")
                                     .font(.headline)
+
+                                if let sizeText = model.availableUpdateSizeText {
+                                    Text("Update size: \(sizeText)")
+                                        .foregroundStyle(.secondary)
+                                }
 
                                 if let notes = availableUpdate.notes, !notes.isEmpty {
                                     Text(notes)
@@ -95,19 +95,11 @@ struct ContentView: View {
                                 }
 
                                 HStack(spacing: 12) {
-                                    Button(model.isInstallingUpdate ? "Installing..." : "Download and Install Update") {
+                                    Button(model.isInstallingUpdate ? "Updating..." : "Update Now") {
                                         installUpdate()
                                     }
                                     .buttonStyle(.bordered)
                                     .disabled(model.isInstallingUpdate)
-
-                                    if let releaseNotesURL = availableUpdate.releaseNotesURL,
-                                       let url = URL(string: releaseNotesURL) {
-                                        Button("Release Notes") {
-                                            NSWorkspace.shared.open(url)
-                                        }
-                                        .buttonStyle(.bordered)
-                                    }
                                 }
                             }
                             .padding(12)
@@ -115,6 +107,9 @@ struct ContentView: View {
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                                     .fill(Color(nsColor: .controlBackgroundColor))
                             )
+                        } else if model.hasCheckedForUpdates && model.updateErrorMessage.isEmpty {
+                            Text("This is the latest version.")
+                                .foregroundStyle(.secondary)
                         }
 
                         if !model.updateErrorMessage.isEmpty {

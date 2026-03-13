@@ -37,7 +37,7 @@ struct ExportedSettings: Codable {
     let notificationsEnabled: Bool
     let hotkeyEnabled: Bool
     let launchAtLoginEnabled: Bool
-    let updateFeedURLString: String
+    let updateFeedURLString: String?
 }
 
 struct QuitSummary {
@@ -58,10 +58,13 @@ struct UpdateFeed: Codable, Equatable {
     let releaseNotesURL: String?
     let minimumSystemVersion: String?
     let notes: String?
+    let sizeBytes: Int64?
 }
 
 @MainActor
 final class AppModel: ObservableObject {
+    private static let builtInUpdateFeedURLString = "https://raw.githubusercontent.com/agraja38/justQuit/main/docs/update.json"
+
     @Published private(set) var runningApps: [RunningAppInfo] = []
 
     @Published var excludedBundleIdentifiers: Set<String> = [] { didSet { persist() } }
@@ -75,14 +78,16 @@ final class AppModel: ObservableObject {
     @Published var notificationsEnabled = true { didSet { persist() } }
     @Published var hotkeyEnabled = false { didSet { persist() } }
     @Published var launchAtLoginEnabled = false { didSet { persist() } }
-    @Published var updateFeedURLString = "" { didSet { persist() } }
     @Published var firstRunCompleted = false { didSet { persist() } }
 
     @Published var statusMessage = "Ready"
     @Published var newProfileName = ""
     @Published var availableUpdate: UpdateFeed?
+    @Published var availableUpdateSizeBytes: Int64?
     @Published var updateErrorMessage = ""
     @Published var isInstallingUpdate = false
+    @Published var isCheckingForUpdates = false
+    @Published var hasCheckedForUpdates = false
 
     private let workspace = NSWorkspace.shared
     private let defaultsPrefix = "justQuit."
@@ -118,6 +123,31 @@ final class AppModel: ObservableObject {
 
     var currentVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+    }
+
+    var updateFeedURL: URL {
+        URL(string: Self.builtInUpdateFeedURLString)!
+    }
+
+    var updateStatusText: String {
+        if isCheckingForUpdates {
+            return "Checking for updates..."
+        }
+
+        if let availableUpdate {
+            return "Version \(availableUpdate.version) is ready."
+        }
+
+        if hasCheckedForUpdates && updateErrorMessage.isEmpty {
+            return "This is the latest version."
+        }
+
+        return "Current version: \(currentVersion)"
+    }
+
+    var availableUpdateSizeText: String? {
+        guard let availableUpdateSizeBytes else { return nil }
+        return ByteCountFormatter.string(fromByteCount: availableUpdateSizeBytes, countStyle: .file)
     }
 
     func shouldQuit(_ app: RunningAppInfo) -> Bool {
@@ -252,7 +282,7 @@ final class AppModel: ObservableObject {
             notificationsEnabled: notificationsEnabled,
             hotkeyEnabled: hotkeyEnabled,
             launchAtLoginEnabled: launchAtLoginEnabled,
-            updateFeedURLString: updateFeedURLString
+            updateFeedURLString: nil
         )
 
         let data = try JSONEncoder().encode(payload)
@@ -274,30 +304,28 @@ final class AppModel: ObservableObject {
         notificationsEnabled = payload.notificationsEnabled
         hotkeyEnabled = payload.hotkeyEnabled
         launchAtLoginEnabled = payload.launchAtLoginEnabled
-        updateFeedURLString = payload.updateFeedURLString
 
         statusMessage = "Imported settings."
     }
 
     func checkForUpdates(silent: Bool = false) async {
+        isCheckingForUpdates = true
+        hasCheckedForUpdates = false
         updateErrorMessage = ""
-
-        let trimmedURL = updateFeedURLString.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedURL.isEmpty, let url = URL(string: trimmedURL) else {
-            if !silent {
-                statusMessage = "Add a valid update feed URL first."
-            }
-            return
+        availableUpdateSizeBytes = nil
+        defer {
+            isCheckingForUpdates = false
+            hasCheckedForUpdates = true
         }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await URLSession.shared.data(from: updateFeedURL)
             let feed = try JSONDecoder().decode(UpdateFeed.self, from: data)
 
             guard feed.version.compare(currentVersion, options: .numeric) == .orderedDescending else {
                 availableUpdate = nil
                 if !silent {
-                    statusMessage = "You're up to date."
+                    statusMessage = "This is the latest version."
                 }
                 return
             }
@@ -311,23 +339,16 @@ final class AppModel: ObservableObject {
             }
 
             availableUpdate = feed
+            availableUpdateSizeBytes = try await resolveUpdateSize(for: feed)
             statusMessage = "Update \(feed.version) is available."
         } catch {
             availableUpdate = nil
+            availableUpdateSizeBytes = nil
             updateErrorMessage = error.localizedDescription
             if !silent {
                 statusMessage = "Could not check for updates."
             }
         }
-    }
-
-    func openAvailableUpdate() {
-        guard let availableUpdate, let url = URL(string: availableUpdate.downloadURL) else {
-            statusMessage = "No update download URL is available."
-            return
-        }
-
-        workspace.open(url)
     }
 
     func markOnboardingCompleted() {
@@ -354,7 +375,6 @@ final class AppModel: ObservableObject {
         notificationsEnabled = defaults.object(forKey: key("notificationsEnabled")) as? Bool ?? true
         hotkeyEnabled = defaults.object(forKey: key("hotkeyEnabled")) as? Bool ?? false
         launchAtLoginEnabled = defaults.object(forKey: key("launchAtLoginEnabled")) as? Bool ?? false
-        updateFeedURLString = defaults.string(forKey: key("updateFeedURLString")) ?? ""
         firstRunCompleted = defaults.object(forKey: key("firstRunCompleted")) as? Bool ?? false
 
         if let profilesData = defaults.data(forKey: key("profiles")),
@@ -376,7 +396,6 @@ final class AppModel: ObservableObject {
         defaults.set(notificationsEnabled, forKey: key("notificationsEnabled"))
         defaults.set(hotkeyEnabled, forKey: key("hotkeyEnabled"))
         defaults.set(launchAtLoginEnabled, forKey: key("launchAtLoginEnabled"))
-        defaults.set(updateFeedURLString, forKey: key("updateFeedURLString"))
         defaults.set(firstRunCompleted, forKey: key("firstRunCompleted"))
 
         if let profilesData = try? JSONEncoder().encode(profiles) {
@@ -395,6 +414,31 @@ final class AppModel: ObservableObject {
         let patch = parts.count > 2 ? parts[2] : 0
         let minimum = OperatingSystemVersion(majorVersion: major, minorVersion: minor, patchVersion: patch)
         return ProcessInfo.processInfo.isOperatingSystemAtLeast(minimum)
+    }
+
+    private func resolveUpdateSize(for feed: UpdateFeed) async throws -> Int64? {
+        if let sizeBytes = feed.sizeBytes {
+            return sizeBytes
+        }
+
+        guard let url = URL(string: feed.downloadURL) else {
+            return nil
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        let (_, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            return nil
+        }
+
+        if let contentLength = httpResponse.value(forHTTPHeaderField: "Content-Length"),
+           let sizeBytes = Int64(contentLength) {
+            return sizeBytes
+        }
+
+        return nil
     }
 
 }
