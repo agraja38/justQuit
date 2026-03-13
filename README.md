@@ -1,30 +1,37 @@
 # justQuit
 
-justQuit is a native macOS menu bar app that closes open apps while letting you protect the ones you want to keep running.
+justQuit is a Mac menu bar app that helps you quickly close the apps you no longer need while keeping the ones you want to stay open.
 
-## What it does
+It is designed for moments when your desktop feels crowded and you want a faster way to clean things up without manually quitting every app one by one.
 
-- Detects running apps using `NSWorkspace`
-- Lets you protect regular apps with toggles
-- Lets you include or skip menu bar/background apps
-- Supports countdowns, confirmations, profiles, notifications, and a global hotkey
-- Checks for updates from a hosted update feed
+## What justQuit does
 
-## Build
+- Quits open apps from a single menu bar button
+- Lets you choose which apps should stay protected
+- Gives you control over menu bar and background apps too
+- Helps you clean up your Mac faster without losing the apps you still need
 
-```bash
-cd /Users/agrajawijayawardane/Documents/Playground/QuitKeeper
-chmod +x build.sh
-./build.sh
-open justQuit.app
-```
+## Features and options
 
-Build outputs:
+- Menu bar control for quick access at any time
+- A full app window where you can manage protected and included apps
+- Countdown before quitting, with the option to cancel
+- Confirmation prompts when closing a larger number of apps
+- Global keyboard shortcut for quick use
+- Profiles for saving different app protection setups
+- Launch at login option
+- Notifications
+- Built-in update checking and in-app updating
+- Export and import settings
+- Search to quickly find apps in the list
 
-- `/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.app`
-- `/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.zip`
-- `/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.dmg`
+## Why use it
 
-## Updates
+- Clean up your workspace faster
+- Keep your most important apps safe
+- Use different setups for different situations
+- Stay up to date with new versions of the app
 
-The hosted update feed for the app lives at `docs/update.json`.
+## Download
+
+The latest installer and update files are available from the GitHub Releases page.
