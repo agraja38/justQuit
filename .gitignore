@@ -1,0 +1,11 @@
+.DS_Store
+vendor/
+dmg-staging.*/
+justQuit.app/
+justQuit.dmg
+justQuit.dmg.zip
+justQuit.zip
+justQuit.iconset/
+apply_file_icon.swift
+AppBundle/Contents/MacOS/
+AppBundle/Contents/Resources/QuitKeeper.icns

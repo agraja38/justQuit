@@ -1,13 +1,14 @@
 # justQuit
 
-justQuit is a small native macOS app that closes all currently open regular apps while automatically leaving menu bar and background apps alone.
+justQuit is a native macOS menu bar app that closes open apps while letting you protect the ones you want to keep running.
 
 ## What it does
 
-- Detects currently running apps using `NSWorkspace`.
-- Skips menu bar or background apps by default.
-- Lets you protect any regular app with a GUI toggle.
-- Saves your protected app list between launches.
+- Detects running apps using `NSWorkspace`
+- Lets you protect regular apps with toggles
+- Lets you include or skip menu bar/background apps
+- Supports countdowns, confirmations, profiles, notifications, and a global hotkey
+- Checks for updates from a hosted update feed
 
 ## Build
 
@@ -18,6 +19,12 @@ chmod +x build.sh
 open justQuit.app
 ```
 
-The app bundle is created at:
+Build outputs:
 
-`/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.app`
+- `/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.app`
+- `/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.zip`
+- `/Users/agrajawijayawardane/Documents/Playground/QuitKeeper/justQuit.dmg`
+
+## Updates
+
+The hosted update feed for the app lives at `docs/update.json`.
