@@ -1,0 +1,7 @@
+{
+  "version": "1.1",
+  "downloadURL": "https://example.com/justQuit.zip",
+  "releaseNotesURL": "https://example.com/justQuit-release-notes.html",
+  "minimumSystemVersion": "13.0",
+  "notes": "Bug fixes and improvements."
+}
