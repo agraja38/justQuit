@@ -311,21 +311,8 @@ private final class StatusBarController: NSObject {
         triggerQuit()
     }
 
-    @objc private func cancelCountdownFromMenu() {
-        cancelCountdown()
-    }
-
-    @objc private func refreshAppsFromMenu() {
-        model.refreshApps()
-    }
-
     @objc private func restoreLastSessionFromMenu() {
         model.restoreLastSession()
-    }
-
-    @objc private func toggleQuickProtection(_ sender: NSMenuItem) {
-        guard let app = sender.representedObject as? RunningAppInfo else { return }
-        model.toggleProtection(for: app)
     }
 
     @objc private func applyProfileFromMenu(_ sender: NSMenuItem) {
@@ -384,8 +371,6 @@ private final class StatusBarController: NSObject {
         let quitAllItem = NSMenuItem(title: "Quit All Eligible Apps", action: #selector(quitEverythingFromMenu), keyEquivalent: "q")
         quitAllItem.keyEquivalentModifierMask = [.control, .option]
         menu.addItem(quitAllItem)
-        menu.addItem(NSMenuItem(title: "Cancel Countdown", action: #selector(cancelCountdownFromMenu), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Refresh Apps", action: #selector(refreshAppsFromMenu), keyEquivalent: ""))
         let restoreItem = NSMenuItem(title: "Restore Last Session", action: #selector(restoreLastSessionFromMenu), keyEquivalent: "")
         restoreItem.isEnabled = model.lastRestoreSession != nil
         menu.addItem(restoreItem)
@@ -403,19 +388,6 @@ private final class StatusBarController: NSObject {
             menu.addItem(profilesItem)
             menu.setSubmenu(profilesMenu, for: profilesItem)
         }
-
-        let quickToggleMenu = NSMenu()
-        for app in model.quickToggleApps {
-            let title = model.isExcluded(app) ? "Include \(app.name)" : "Protect \(app.name)"
-            let item = NSMenuItem(title: title, action: #selector(toggleQuickProtection), keyEquivalent: "")
-            item.target = self
-            item.representedObject = app
-            quickToggleMenu.addItem(item)
-        }
-
-        let quickToggleItem = NSMenuItem(title: "Quick Toggles", action: nil, keyEquivalent: "")
-        menu.addItem(quickToggleItem)
-        menu.setSubmenu(quickToggleMenu, for: quickToggleItem)
 
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit justQuit", action: #selector(quitApp), keyEquivalent: ""))

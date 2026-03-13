@@ -1,8 +1,8 @@
 {
-  "version": "1.2.01",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.01/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.01",
+  "version": "1.2.02",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.02/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.02",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1040768,
-  "notes": "Adds menu bar icon style choices and a recent session restore button so you can bring back the apps from your last justQuit cleanup."
+  "sizeBytes": 1031195,
+  "notes": "Cleans up the updater message so the latest-version notice only appears once, and simplifies the menu bar dropdown by removing countdown, refresh, and quick-toggle items."
 }

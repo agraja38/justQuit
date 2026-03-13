@@ -127,9 +127,6 @@ struct ContentView: View {
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                                     .fill(Color(nsColor: .controlBackgroundColor))
                             )
-                        } else if model.hasCheckedForUpdates && model.updateErrorMessage.isEmpty {
-                            Text("This is the latest version.")
-                                .foregroundStyle(.secondary)
                         }
 
                         if !model.updateErrorMessage.isEmpty {
