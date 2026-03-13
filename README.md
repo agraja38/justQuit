@@ -35,3 +35,12 @@ It is designed for moments when your desktop feels crowded and you want a faster
 ## Download
 
 The latest installer and update files are available from the GitHub Releases page.
+
+Installer download:
+- [justQuit.dmg](https://github.com/agraja38/justQuit/releases/download/v1.1/justQuit.dmg)
+
+One-line install command:
+
+```bash
+curl -L https://github.com/agraja38/justQuit/releases/download/v1.1/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
+```
