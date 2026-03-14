@@ -1,8 +1,8 @@
 {
-  "version": "1.2.08",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.08/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.08",
+  "version": "1.2.09",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.09/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.09",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1041600,
-  "notes": "Shows the current app version above the Check for Updates button so the updater section is easier to scan."
+  "sizeBytes": 1045597,
+  "notes": "Sends a macOS notification when a new justQuit version is available, without repeating the same update alert every launch."
 }

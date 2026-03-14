@@ -46,6 +46,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         Task {
             await model.checkForUpdates(silent: true)
+            if model.notificationsEnabled, model.shouldNotifyAboutAvailableUpdate(),
+               let availableUpdate = model.availableUpdate {
+                notifications.postUpdateAvailable(version: availableUpdate.version)
+                model.markAvailableUpdateNotified()
+            }
         }
 
         if !model.firstRunCompleted {

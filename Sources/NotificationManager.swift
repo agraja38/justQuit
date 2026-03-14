@@ -23,4 +23,19 @@ final class NotificationManager {
 
         center.add(request)
     }
+
+    func postUpdateAvailable(version: String) {
+        let content = UNMutableNotificationContent()
+        content.title = "justQuit update available"
+        content.body = "Version \(version) is ready to install."
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "justquit-update-\(version)",
+            content: content,
+            trigger: nil
+        )
+
+        center.add(request)
+    }
 }

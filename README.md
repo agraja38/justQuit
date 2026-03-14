@@ -22,6 +22,7 @@ It is designed for moments when your desktop feels crowded and you want a faster
 - Recent session restore to reopen the apps from your last cleanup
 - Launch at login option
 - Notifications
+- Update available notifications
 - Custom menu bar icon styles
 - Built-in update checking and in-app updating
 - Export and import settings
@@ -39,10 +40,10 @@ It is designed for moments when your desktop feels crowded and you want a faster
 The latest installer and update files are available from the GitHub Releases page.
 
 Installer download:
-- [justQuit.dmg](https://github.com/agraja38/justQuit/releases/download/v1.2.08/justQuit.dmg)
+- [justQuit.dmg](https://github.com/agraja38/justQuit/releases/download/v1.2.09/justQuit.dmg)
 
 One-line install command:
 
 ```bash
-curl -L https://github.com/agraja38/justQuit/releases/download/v1.2.08/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
+curl -L https://github.com/agraja38/justQuit/releases/download/v1.2.09/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
 ```

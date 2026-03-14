@@ -140,6 +140,7 @@ final class AppModel: ObservableObject {
     @Published var isCheckingForUpdates = false
     @Published var hasCheckedForUpdates = false
     @Published private(set) var lastRestoreSession: RestoreSession?
+    @Published private(set) var lastUpdateNotificationVersion: String?
 
     private let workspace = NSWorkspace.shared
     private let defaultsPrefix = "justQuit."
@@ -471,6 +472,16 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func shouldNotifyAboutAvailableUpdate() -> Bool {
+        guard let availableUpdate else { return false }
+        return lastUpdateNotificationVersion != availableUpdate.version
+    }
+
+    func markAvailableUpdateNotified() {
+        lastUpdateNotificationVersion = availableUpdate?.version
+        persist()
+    }
+
     func markOnboardingCompleted() {
         firstRunCompleted = true
     }
@@ -510,6 +521,8 @@ final class AppModel: ObservableObject {
            let decodedSession = try? JSONDecoder().decode(RestoreSession.self, from: restoreData) {
             lastRestoreSession = decodedSession
         }
+
+        lastUpdateNotificationVersion = defaults.string(forKey: key("lastUpdateNotificationVersion"))
     }
 
     private func persist() {
@@ -535,6 +548,8 @@ final class AppModel: ObservableObject {
         if let restoreData = try? JSONEncoder().encode(lastRestoreSession) {
             defaults.set(restoreData, forKey: key("lastRestoreSession"))
         }
+
+        defaults.set(lastUpdateNotificationVersion, forKey: key("lastUpdateNotificationVersion"))
     }
 
     private func key(_ suffix: String) -> String {
