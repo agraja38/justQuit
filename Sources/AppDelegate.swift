@@ -376,13 +376,7 @@ private final class StatusBarController: NSObject {
 
     private func showContextMenu() {
         let menu = NSMenu()
-
-        let creditItem = NSMenuItem(title: "Created by Agraja", action: nil, keyEquivalent: "")
-        creditItem.isEnabled = false
-        menu.addItem(creditItem)
-
-        menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Open GUI", action: #selector(openGUIFromMenu), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Open justQuit", action: #selector(openGUIFromMenu), keyEquivalent: ""))
         let quitAllItem = NSMenuItem(title: "Quit All Eligible Apps", action: #selector(quitEverythingFromMenu), keyEquivalent: "q")
         quitAllItem.keyEquivalentModifierMask = [.control, .option]
         menu.addItem(quitAllItem)
