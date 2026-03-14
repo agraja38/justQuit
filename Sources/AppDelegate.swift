@@ -19,6 +19,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var countdownRemaining = 0
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard ensureSingleInstance() else {
+            NSApp.terminate(nil)
+            return
+        }
+
         NSApp.setActivationPolicy(.accessory)
 
         statusBarController = StatusBarController(
@@ -191,9 +196,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private func showOnboarding() {
         let alert = NSAlert()
         alert.messageText = "Welcome to justQuit"
-        alert.informativeText = "justQuit starts in the menu bar, supports profiles and quick toggles, and can trigger from the global hotkey \u{2303}\u{2325}Q."
+        alert.informativeText = "justQuit starts in the menu bar, supports profiles and restore sessions, and can trigger from the global hotkey \u{2303}\u{2325}Q."
         alert.addButton(withTitle: "Got it")
         alert.runModal()
+    }
+
+    private func ensureSingleInstance() -> Bool {
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+            return true
+        }
+
+        let currentProcessID = ProcessInfo.processInfo.processIdentifier
+        let matchingApps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
+        return !matchingApps.contains { $0.processIdentifier != currentProcessID && !$0.isTerminated }
     }
 
     private func showMainWindow() {

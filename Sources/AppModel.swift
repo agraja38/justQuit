@@ -95,6 +95,7 @@ enum MenuBarIconStyle: String, Codable, CaseIterable, Identifiable {
 @MainActor
 final class AppModel: ObservableObject {
     private static let builtInUpdateFeedURLString = "https://raw.githubusercontent.com/agraja38/justQuit/main/docs/update.json"
+    private static let alwaysProtectedBundleIdentifiers: Set<String> = ["com.apple.finder"]
 
     @Published private(set) var runningApps: [RunningAppInfo] = []
 
@@ -183,6 +184,10 @@ final class AppModel: ObservableObject {
         return ByteCountFormatter.string(fromByteCount: availableUpdateSizeBytes, countStyle: .file)
     }
 
+    func isAlwaysProtected(_ app: RunningAppInfo) -> Bool {
+        Self.alwaysProtectedBundleIdentifiers.contains(app.bundleIdentifier)
+    }
+
     var lastRestoreSummaryText: String {
         guard let lastRestoreSession else {
             return "No recent session yet."
@@ -195,6 +200,10 @@ final class AppModel: ObservableObject {
     }
 
     func shouldQuit(_ app: RunningAppInfo) -> Bool {
+        if isAlwaysProtected(app) {
+            return false
+        }
+
         if app.isMenuBarOrBackgroundApp {
             return includedBackgroundBundleIdentifiers.contains(app.bundleIdentifier)
         }
@@ -207,6 +216,8 @@ final class AppModel: ObservableObject {
     }
 
     func toggleProtection(for app: RunningAppInfo) {
+        guard !isAlwaysProtected(app) else { return }
+
         if app.isMenuBarOrBackgroundApp {
             if includedBackgroundBundleIdentifiers.contains(app.bundleIdentifier) {
                 includedBackgroundBundleIdentifiers.remove(app.bundleIdentifier)

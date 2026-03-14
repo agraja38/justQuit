@@ -1,8 +1,8 @@
 {
-  "version": "1.2.02",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.02/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.02",
+  "version": "1.2.03",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.03/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.03",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1031195,
-  "notes": "Cleans up the updater message so the latest-version notice only appears once, and simplifies the menu bar dropdown by removing countdown, refresh, and quick-toggle items."
+  "sizeBytes": 1037265,
+  "notes": "Keeps Finder permanently protected so it can never be quit from justQuit, and prevents a second justQuit instance from launching at the same time."
 }

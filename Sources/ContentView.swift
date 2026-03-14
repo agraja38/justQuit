@@ -272,7 +272,8 @@ struct ContentView: View {
                         AppRow(
                             app: app,
                             isProtected: model.isExcluded(app),
-                            detail: model.isExcluded(app) ? protectedLabel(for: app) : "Will quit",
+                            detail: rowDetail(for: app),
+                            isToggleDisabled: model.isAlwaysProtected(app),
                             action: { model.toggleProtection(for: app) }
                         )
                     }
@@ -300,7 +301,15 @@ struct ContentView: View {
     }
 
     private func protectedLabel(for app: RunningAppInfo) -> String {
+        if model.isAlwaysProtected(app) {
+            return "Always protected"
+        }
+
         return app.isMenuBarOrBackgroundApp ? "Skipped" : "Protected"
+    }
+
+    private func rowDetail(for app: RunningAppInfo) -> String {
+        model.isExcluded(app) ? protectedLabel(for: app) : "Will quit"
     }
 
     private func exportSettings() {
@@ -336,6 +345,7 @@ private struct AppRow: View {
     let app: RunningAppInfo
     let isProtected: Bool
     let detail: String
+    let isToggleDisabled: Bool
     let action: () -> Void
 
     var body: some View {
@@ -364,6 +374,7 @@ private struct AppRow: View {
             ))
             .toggleStyle(.switch)
             .labelsHidden()
+            .disabled(isToggleDisabled)
         }
         .padding(12)
         .background(
