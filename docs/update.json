@@ -1,8 +1,8 @@
 {
-  "version": "1.2.06",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.06/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.06",
+  "version": "1.2.07",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.07/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.07",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1065060,
-  "notes": "Changes minimize-all to send windows to the Dock instead of hiding apps, and adds a setting to turn the minimize feature on or off."
+  "sizeBytes": 1042834,
+  "notes": "Removes the minimize gesture and shortcut feature, returning justQuit to its simpler quit-focused workflow."
 }

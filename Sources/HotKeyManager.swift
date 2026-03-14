@@ -3,33 +3,22 @@ import Foundation
 
 @MainActor
 final class HotKeyManager {
-    private var quitHotKeyRef: EventHotKeyRef?
-    private var minimizeHotKeyRef: EventHotKeyRef?
+    private var hotKeyRef: EventHotKeyRef?
     private var eventHandler: EventHandlerRef?
-    private let quitHotKeyID = EventHotKeyID(signature: OSType(0x6A715154), id: 1)
-    private let minimizeHotKeyID = EventHotKeyID(signature: OSType(0x6A715154), id: 2)
-    private let quitHandler: () -> Void
-    private let minimizeHandler: () -> Void
-    private let supportsMinimizeHotKey: Bool
-    private var quitEnabled = false
-    private var minimizeEnabled = false
+    private let hotKeyID = EventHotKeyID(signature: OSType(0x6A715154), id: 1)
+    private let handler: () -> Void
 
-    init(
-        supportsMinimizeHotKey: Bool,
-        quitHandler: @escaping () -> Void,
-        minimizeHandler: @escaping () -> Void
-    ) {
-        self.supportsMinimizeHotKey = supportsMinimizeHotKey
-        self.quitHandler = quitHandler
-        self.minimizeHandler = minimizeHandler
+    init(handler: @escaping () -> Void) {
+        self.handler = handler
         installHandler()
     }
 
-    func updateRegistration(quitEnabled: Bool, minimizeEnabled: Bool) {
-        self.quitEnabled = quitEnabled
-        self.minimizeEnabled = minimizeEnabled && supportsMinimizeHotKey
-        register()
-        unregisterDisabledHotKeys()
+    func setEnabled(_ enabled: Bool) {
+        if enabled {
+            register()
+        } else {
+            unregister()
+        }
     }
 
     private func installHandler() {
@@ -51,10 +40,8 @@ final class HotKeyManager {
                     &hotKeyID
                 )
 
-                if hotKeyID.signature == manager.quitHotKeyID.signature && hotKeyID.id == manager.quitHotKeyID.id {
-                    manager.quitHandler()
-                } else if hotKeyID.signature == manager.minimizeHotKeyID.signature && hotKeyID.id == manager.minimizeHotKeyID.id {
-                    manager.minimizeHandler()
+                if hotKeyID.signature == manager.hotKeyID.signature && hotKeyID.id == manager.hotKeyID.id {
+                    manager.handler()
                 }
 
                 return noErr
@@ -67,38 +54,22 @@ final class HotKeyManager {
     }
 
     private func register() {
-        if quitEnabled, quitHotKeyRef == nil {
-            RegisterEventHotKey(
-                UInt32(kVK_ANSI_Q),
-                UInt32(controlKey | optionKey),
-                quitHotKeyID,
-                GetApplicationEventTarget(),
-                0,
-                &quitHotKeyRef
-            )
-        }
+        guard hotKeyRef == nil else { return }
 
-        if minimizeEnabled, minimizeHotKeyRef == nil {
-            RegisterEventHotKey(
-                UInt32(kVK_DownArrow),
-                UInt32(controlKey | optionKey),
-                minimizeHotKeyID,
-                GetApplicationEventTarget(),
-                0,
-                &minimizeHotKeyRef
-            )
-        }
+        RegisterEventHotKey(
+            UInt32(kVK_ANSI_Q),
+            UInt32(controlKey | optionKey),
+            hotKeyID,
+            GetApplicationEventTarget(),
+            0,
+            &hotKeyRef
+        )
     }
 
-    private func unregisterDisabledHotKeys() {
-        if !quitEnabled, let quitHotKeyRef {
-            UnregisterEventHotKey(quitHotKeyRef)
-            self.quitHotKeyRef = nil
-        }
-
-        if !minimizeEnabled, let minimizeHotKeyRef {
-            UnregisterEventHotKey(minimizeHotKeyRef)
-            self.minimizeHotKeyRef = nil
+    private func unregister() {
+        if let hotKeyRef {
+            UnregisterEventHotKey(hotKeyRef)
+            self.hotKeyRef = nil
         }
     }
 }
