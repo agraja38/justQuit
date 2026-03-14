@@ -20,7 +20,7 @@ It is designed for moments when your desktop feels crowded and you want a faster
 - Global keyboard shortcut for quick use
 - Profiles for saving different app protection setups
 - Recent session restore to reopen the apps from your last cleanup
-- Minimize all open apps with a quick gesture or shortcut
+- Minimize all open app windows to the Dock with a quick gesture or shortcut
 - Launch at login option
 - Notifications
 - Custom menu bar icon styles
@@ -40,10 +40,10 @@ It is designed for moments when your desktop feels crowded and you want a faster
 The latest installer and update files are available from the GitHub Releases page.
 
 Installer download:
-- [justQuit.dmg](https://github.com/agraja38/justQuit/releases/download/v1.2.05/justQuit.dmg)
+- [justQuit.dmg](https://github.com/agraja38/justQuit/releases/download/v1.2.06/justQuit.dmg)
 
 One-line install command:
 
 ```bash
-curl -L https://github.com/agraja38/justQuit/releases/download/v1.2.05/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
+curl -L https://github.com/agraja38/justQuit/releases/download/v1.2.06/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
 ```

@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 import Combine
 import Foundation
 import Darwin
@@ -52,6 +53,7 @@ struct ExportedSettings: Codable {
     let confirmationThreshold: Int
     let countdownEnabled: Bool
     let countdownSeconds: Int
+    let minimizeAllEnabled: Bool?
     let notificationsEnabled: Bool
     let hotkeyEnabled: Bool
     let launchAtLoginEnabled: Bool
@@ -125,6 +127,7 @@ final class AppModel: ObservableObject {
     @Published var confirmationThreshold = 5 { didSet { persist() } }
     @Published var countdownEnabled = false { didSet { persist() } }
     @Published var countdownSeconds = 5 { didSet { persist() } }
+    @Published var minimizeAllEnabled = true { didSet { persist() } }
     @Published var notificationsEnabled = true { didSet { persist() } }
     @Published var hotkeyEnabled = false { didSet { persist() } }
     @Published var launchAtLoginEnabled = false { didSet { persist() } }
@@ -358,13 +361,21 @@ final class AppModel: ObservableObject {
             return
         }
 
-        for target in targets {
-            workspace.runningApplications
-                .first(where: { $0.processIdentifier == target.processIdentifier })?
-                .hide()
+        guard AXIsProcessTrusted() else {
+            statusMessage = "Allow Accessibility access for justQuit to minimize windows."
+            return
         }
 
-        statusMessage = "Minimized \(targets.count) app(s)."
+        var minimizedCount = 0
+        for target in targets {
+            minimizedCount += minimizeWindows(for: target.processIdentifier)
+        }
+
+        if minimizedCount == 0 {
+            statusMessage = "No windows could be minimized."
+        } else {
+            statusMessage = "Minimized \(minimizedCount) window(s) to the Dock."
+        }
     }
 
     func shouldAskForConfirmation(appCount: Int) -> Bool {
@@ -411,6 +422,7 @@ final class AppModel: ObservableObject {
             confirmationThreshold: confirmationThreshold,
             countdownEnabled: countdownEnabled,
             countdownSeconds: countdownSeconds,
+            minimizeAllEnabled: minimizeAllEnabled,
             notificationsEnabled: notificationsEnabled,
             hotkeyEnabled: hotkeyEnabled,
             launchAtLoginEnabled: launchAtLoginEnabled,
@@ -434,6 +446,7 @@ final class AppModel: ObservableObject {
         confirmationThreshold = payload.confirmationThreshold
         countdownEnabled = payload.countdownEnabled
         countdownSeconds = payload.countdownSeconds
+        minimizeAllEnabled = payload.minimizeAllEnabled ?? true
         notificationsEnabled = payload.notificationsEnabled
         hotkeyEnabled = payload.hotkeyEnabled
         launchAtLoginEnabled = payload.launchAtLoginEnabled
@@ -509,6 +522,7 @@ final class AppModel: ObservableObject {
         confirmationThreshold = defaults.object(forKey: key("confirmationThreshold")) as? Int ?? 5
         countdownEnabled = defaults.object(forKey: key("countdownEnabled")) as? Bool ?? false
         countdownSeconds = defaults.object(forKey: key("countdownSeconds")) as? Int ?? 5
+        minimizeAllEnabled = defaults.object(forKey: key("minimizeAllEnabled")) as? Bool ?? true
         notificationsEnabled = defaults.object(forKey: key("notificationsEnabled")) as? Bool ?? true
         hotkeyEnabled = defaults.object(forKey: key("hotkeyEnabled")) as? Bool ?? false
         launchAtLoginEnabled = defaults.object(forKey: key("launchAtLoginEnabled")) as? Bool ?? false
@@ -539,6 +553,7 @@ final class AppModel: ObservableObject {
         defaults.set(confirmationThreshold, forKey: key("confirmationThreshold"))
         defaults.set(countdownEnabled, forKey: key("countdownEnabled"))
         defaults.set(countdownSeconds, forKey: key("countdownSeconds"))
+        defaults.set(minimizeAllEnabled, forKey: key("minimizeAllEnabled"))
         defaults.set(notificationsEnabled, forKey: key("notificationsEnabled"))
         defaults.set(hotkeyEnabled, forKey: key("hotkeyEnabled"))
         defaults.set(launchAtLoginEnabled, forKey: key("launchAtLoginEnabled"))
@@ -590,6 +605,26 @@ final class AppModel: ObservableObject {
         }
 
         return nil
+    }
+
+    private func minimizeWindows(for processIdentifier: pid_t) -> Int {
+        let appElement = AXUIElementCreateApplication(processIdentifier)
+        var windowsValue: CFTypeRef?
+        let result = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &windowsValue)
+
+        guard result == .success, let windows = windowsValue as? [AXUIElement] else {
+            return 0
+        }
+
+        var minimizedCount = 0
+        for window in windows {
+            let setResult = AXUIElementSetAttributeValue(window, kAXMinimizedAttribute as CFString, kCFBooleanTrue)
+            if setResult == .success {
+                minimizedCount += 1
+            }
+        }
+
+        return minimizedCount
     }
 
 }

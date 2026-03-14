@@ -17,7 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             self?.minimizeOpenApps()
         }
     )
-    private lazy var swipeGestureManager = SwipeGestureManager(enabled: model.isLaptopHardware) { [weak self] in
+    private lazy var swipeGestureManager = SwipeGestureManager(enabled: model.isLaptopHardware && model.minimizeAllEnabled) { [weak self] in
         self?.minimizeOpenApps()
     }
 
@@ -93,7 +93,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         model.$hotkeyEnabled
             .sink { [weak self] enabled in
-                self?.hotKeyManager.setEnabled(enabled)
+                guard let self else { return }
+                self.hotKeyManager.updateRegistration(
+                    quitEnabled: enabled,
+                    minimizeEnabled: enabled && self.model.minimizeAllEnabled
+                )
+            }
+            .store(in: &settingsCancellables)
+
+        model.$minimizeAllEnabled
+            .sink { [weak self] enabled in
+                guard let self else { return }
+                self.hotKeyManager.updateRegistration(
+                    quitEnabled: self.model.hotkeyEnabled,
+                    minimizeEnabled: self.model.hotkeyEnabled && enabled
+                )
+                self.swipeGestureManager.setEnabled(self.model.isLaptopHardware && enabled)
             }
             .store(in: &settingsCancellables)
 
@@ -211,9 +226,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let alert = NSAlert()
         alert.messageText = "Welcome to justQuit"
         if model.isLaptopHardware {
-            alert.informativeText = "justQuit starts in the menu bar, supports profiles and restore sessions, lets you quit with \u{2303}\u{2325}Q, and minimizes open apps with a three-finger swipe down."
+            alert.informativeText = "justQuit starts in the menu bar, supports profiles and restore sessions, lets you quit with \u{2303}\u{2325}Q, and can minimize app windows to the Dock with a three-finger swipe down."
         } else {
-            alert.informativeText = "justQuit starts in the menu bar, supports profiles and restore sessions, lets you quit with \u{2303}\u{2325}Q, and minimizes open apps with \u{2303}\u{2325}\u{2193}."
+            alert.informativeText = "justQuit starts in the menu bar, supports profiles and restore sessions, lets you quit with \u{2303}\u{2325}Q, and can minimize app windows to the Dock with \u{2303}\u{2325}\u{2193}."
         }
         alert.addButton(withTitle: "Got it")
         alert.runModal()
@@ -286,8 +301,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 @MainActor
 private final class SwipeGestureManager {
-    private let enabled: Bool
     private let handler: () -> Void
+    private var enabled: Bool
     private var globalMonitor: Any?
     private var localMonitor: Any?
 
@@ -309,7 +324,12 @@ private final class SwipeGestureManager {
         }
     }
 
+    func setEnabled(_ enabled: Bool) {
+        self.enabled = enabled
+    }
+
     private func handle(_ event: NSEvent) {
+        guard enabled else { return }
         guard event.deltaY < 0 else { return }
         handler()
     }

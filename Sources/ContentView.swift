@@ -50,12 +50,14 @@ struct ContentView: View {
                         Toggle("Launch at login", isOn: $model.launchAtLoginEnabled)
                         Toggle("Enable notifications", isOn: $model.notificationsEnabled)
                         Toggle(model.isLaptopHardware ? "Enable global hotkey (\u{2303}\u{2325}Q)" : "Enable global hotkeys (\u{2303}\u{2325}Q and \u{2303}\u{2325}\u{2193})", isOn: $model.hotkeyEnabled)
+                        Toggle("Enable minimize all action", isOn: $model.minimizeAllEnabled)
                         Toggle("Confirm when quitting many apps", isOn: $model.confirmLargeQuitsEnabled)
                         Toggle("Enable countdown before quitting", isOn: $model.countdownEnabled)
 
-                        Text(model.isLaptopHardware ? "Three-finger swipe down minimizes all open apps on this MacBook." : "Use \u{2303}\u{2325}\u{2193} to minimize all open apps on desktop Macs.")
+                        Text(model.isLaptopHardware ? "Three-finger swipe down minimizes all app windows to the Dock on this MacBook." : "Use \u{2303}\u{2325}\u{2193} to minimize all app windows to the Dock on desktop Macs.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                            .opacity(model.minimizeAllEnabled ? 1 : 0.5)
 
                         if model.confirmLargeQuitsEnabled {
                             Stepper("Confirm when quitting \(model.confirmationThreshold)+ apps", value: $model.confirmationThreshold, in: 1 ... 50)

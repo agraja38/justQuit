@@ -11,6 +11,8 @@ final class HotKeyManager {
     private let quitHandler: () -> Void
     private let minimizeHandler: () -> Void
     private let supportsMinimizeHotKey: Bool
+    private var quitEnabled = false
+    private var minimizeEnabled = false
 
     init(
         supportsMinimizeHotKey: Bool,
@@ -23,12 +25,11 @@ final class HotKeyManager {
         installHandler()
     }
 
-    func setEnabled(_ enabled: Bool) {
-        if enabled {
-            register()
-        } else {
-            unregister()
-        }
+    func updateRegistration(quitEnabled: Bool, minimizeEnabled: Bool) {
+        self.quitEnabled = quitEnabled
+        self.minimizeEnabled = minimizeEnabled && supportsMinimizeHotKey
+        register()
+        unregisterDisabledHotKeys()
     }
 
     private func installHandler() {
@@ -66,36 +67,36 @@ final class HotKeyManager {
     }
 
     private func register() {
-        guard quitHotKeyRef == nil else { return }
+        if quitEnabled, quitHotKeyRef == nil {
+            RegisterEventHotKey(
+                UInt32(kVK_ANSI_Q),
+                UInt32(controlKey | optionKey),
+                quitHotKeyID,
+                GetApplicationEventTarget(),
+                0,
+                &quitHotKeyRef
+            )
+        }
 
-        RegisterEventHotKey(
-            UInt32(kVK_ANSI_Q),
-            UInt32(controlKey | optionKey),
-            quitHotKeyID,
-            GetApplicationEventTarget(),
-            0,
-            &quitHotKeyRef
-        )
-
-        guard supportsMinimizeHotKey, minimizeHotKeyRef == nil else { return }
-
-        RegisterEventHotKey(
-            UInt32(kVK_DownArrow),
-            UInt32(controlKey | optionKey),
-            minimizeHotKeyID,
-            GetApplicationEventTarget(),
-            0,
-            &minimizeHotKeyRef
-        )
+        if minimizeEnabled, minimizeHotKeyRef == nil {
+            RegisterEventHotKey(
+                UInt32(kVK_DownArrow),
+                UInt32(controlKey | optionKey),
+                minimizeHotKeyID,
+                GetApplicationEventTarget(),
+                0,
+                &minimizeHotKeyRef
+            )
+        }
     }
 
-    private func unregister() {
-        if let quitHotKeyRef {
+    private func unregisterDisabledHotKeys() {
+        if !quitEnabled, let quitHotKeyRef {
             UnregisterEventHotKey(quitHotKeyRef)
             self.quitHotKeyRef = nil
         }
 
-        if let minimizeHotKeyRef {
+        if !minimizeEnabled, let minimizeHotKeyRef {
             UnregisterEventHotKey(minimizeHotKeyRef)
             self.minimizeHotKeyRef = nil
         }

@@ -1,8 +1,8 @@
 {
-  "version": "1.2.05",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.05/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.05",
+  "version": "1.2.06",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.06/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.06",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1053873,
-  "notes": "Adds a minimize-all-apps action with a three-finger swipe down on MacBooks and a desktop shortcut of Control-Option-Down Arrow."
+  "sizeBytes": 1065060,
+  "notes": "Changes minimize-all to send windows to the Dock instead of hiding apps, and adds a setting to turn the minimize feature on or off."
 }
