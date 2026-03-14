@@ -86,18 +86,21 @@ struct ContentView: View {
 
                 GroupBox("Updates") {
                     VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 12) {
-                            Button("Check for Updates") {
-                                Task {
-                                    await model.checkForUpdates()
-                                }
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .disabled(model.isCheckingForUpdates || model.isInstallingUpdate)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Current version: \(model.currentVersion)")
+                                .font(.subheadline.weight(.semibold))
 
                             Text(model.updateStatusText)
                                 .foregroundStyle(.secondary)
                         }
+
+                        Button("Check for Updates") {
+                            Task {
+                                await model.checkForUpdates()
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(model.isCheckingForUpdates || model.isInstallingUpdate)
 
                         if let availableUpdate = model.availableUpdate {
                             VStack(alignment: .leading, spacing: 6) {
