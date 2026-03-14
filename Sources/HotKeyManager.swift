@@ -3,13 +3,23 @@ import Foundation
 
 @MainActor
 final class HotKeyManager {
-    private var hotKeyRef: EventHotKeyRef?
+    private var quitHotKeyRef: EventHotKeyRef?
+    private var minimizeHotKeyRef: EventHotKeyRef?
     private var eventHandler: EventHandlerRef?
-    private let hotKeyID = EventHotKeyID(signature: OSType(0x6A715154), id: 1)
-    private let handler: () -> Void
+    private let quitHotKeyID = EventHotKeyID(signature: OSType(0x6A715154), id: 1)
+    private let minimizeHotKeyID = EventHotKeyID(signature: OSType(0x6A715154), id: 2)
+    private let quitHandler: () -> Void
+    private let minimizeHandler: () -> Void
+    private let supportsMinimizeHotKey: Bool
 
-    init(handler: @escaping () -> Void) {
-        self.handler = handler
+    init(
+        supportsMinimizeHotKey: Bool,
+        quitHandler: @escaping () -> Void,
+        minimizeHandler: @escaping () -> Void
+    ) {
+        self.supportsMinimizeHotKey = supportsMinimizeHotKey
+        self.quitHandler = quitHandler
+        self.minimizeHandler = minimizeHandler
         installHandler()
     }
 
@@ -40,8 +50,10 @@ final class HotKeyManager {
                     &hotKeyID
                 )
 
-                if hotKeyID.signature == manager.hotKeyID.signature && hotKeyID.id == manager.hotKeyID.id {
-                    manager.handler()
+                if hotKeyID.signature == manager.quitHotKeyID.signature && hotKeyID.id == manager.quitHotKeyID.id {
+                    manager.quitHandler()
+                } else if hotKeyID.signature == manager.minimizeHotKeyID.signature && hotKeyID.id == manager.minimizeHotKeyID.id {
+                    manager.minimizeHandler()
                 }
 
                 return noErr
@@ -54,22 +66,38 @@ final class HotKeyManager {
     }
 
     private func register() {
-        guard hotKeyRef == nil else { return }
+        guard quitHotKeyRef == nil else { return }
 
         RegisterEventHotKey(
             UInt32(kVK_ANSI_Q),
             UInt32(controlKey | optionKey),
-            hotKeyID,
+            quitHotKeyID,
             GetApplicationEventTarget(),
             0,
-            &hotKeyRef
+            &quitHotKeyRef
+        )
+
+        guard supportsMinimizeHotKey, minimizeHotKeyRef == nil else { return }
+
+        RegisterEventHotKey(
+            UInt32(kVK_DownArrow),
+            UInt32(controlKey | optionKey),
+            minimizeHotKeyID,
+            GetApplicationEventTarget(),
+            0,
+            &minimizeHotKeyRef
         )
     }
 
     private func unregister() {
-        if let hotKeyRef {
-            UnregisterEventHotKey(hotKeyRef)
-            self.hotKeyRef = nil
+        if let quitHotKeyRef {
+            UnregisterEventHotKey(quitHotKeyRef)
+            self.quitHotKeyRef = nil
+        }
+
+        if let minimizeHotKeyRef {
+            UnregisterEventHotKey(minimizeHotKeyRef)
+            self.minimizeHotKeyRef = nil
         }
     }
 }

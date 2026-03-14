@@ -1,8 +1,8 @@
 {
-  "version": "1.2.04",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.04/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.04",
+  "version": "1.2.05",
+  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.05/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.05",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1037067,
-  "notes": "Renames the menu bar action to Open justQuit and removes the Created by Agraja line from the dropdown for a cleaner menu."
+  "sizeBytes": 1053873,
+  "notes": "Adds a minimize-all-apps action with a three-finger swipe down on MacBooks and a desktop shortcut of Control-Option-Down Arrow."
 }

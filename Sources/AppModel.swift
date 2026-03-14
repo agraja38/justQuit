@@ -1,6 +1,24 @@
 import AppKit
 import Combine
 import Foundation
+import Darwin
+
+enum HardwareProfile {
+    static let isLaptop: Bool = {
+        var size = 0
+        guard sysctlbyname("hw.model", nil, &size, nil, 0) == 0, size > 1 else {
+            return false
+        }
+
+        var buffer = [CChar](repeating: 0, count: size)
+        guard sysctlbyname("hw.model", &buffer, &size, nil, 0) == 0 else {
+            return false
+        }
+
+        let model = String(cString: buffer)
+        return model.contains("MacBook")
+    }()
+}
 
 struct RunningAppInfo: Identifiable, Hashable {
     let processIdentifier: pid_t
@@ -157,6 +175,10 @@ final class AppModel: ObservableObject {
 
     var currentVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+    }
+
+    var isLaptopHardware: Bool {
+        HardwareProfile.isLaptop
     }
 
     var updateFeedURL: URL {
@@ -326,6 +348,23 @@ final class AppModel: ObservableObject {
         } else {
             statusMessage = "Restored \(reopenedCount) app(s)."
         }
+    }
+
+    func minimizeOpenApps() {
+        let targets = runningApps.filter { !$0.isMenuBarOrBackgroundApp }
+
+        guard !targets.isEmpty else {
+            statusMessage = "No open apps to minimize."
+            return
+        }
+
+        for target in targets {
+            workspace.runningApplications
+                .first(where: { $0.processIdentifier == target.processIdentifier })?
+                .hide()
+        }
+
+        statusMessage = "Minimized \(targets.count) app(s)."
     }
 
     func shouldAskForConfirmation(appCount: Int) -> Bool {
