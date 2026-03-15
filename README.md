@@ -47,3 +47,7 @@ One-line install command:
 ```bash
 curl -L https://github.com/agraja38/justQuit/releases/download/v1.2.09/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
 ```
+
+## License
+
+MIT
