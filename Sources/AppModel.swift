@@ -112,7 +112,7 @@ enum MenuBarIconStyle: String, Codable, CaseIterable, Identifiable {
 
 @MainActor
 final class AppModel: ObservableObject {
-    private static let builtInUpdateFeedURLString = "https://raw.githubusercontent.com/agraja38/justQuit/main/docs/update.json"
+    private static let builtInUpdateFeedURLString = "https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit/update.json"
     private static let alwaysProtectedBundleIdentifiers: Set<String> = ["com.apple.finder"]
 
     @Published private(set) var runningApps: [RunningAppInfo] = []

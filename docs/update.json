@@ -1,7 +1,7 @@
 {
   "version": "1.2.09",
-  "downloadURL": "https://github.com/agraja38/justQuit/releases/download/v1.2.09/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/justQuit/releases/tag/v1.2.09",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.09/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.09",
   "minimumSystemVersion": "13.0",
   "sizeBytes": 1045597,
   "notes": "Sends a macOS notification when a new justQuit version is available, without repeating the same update alert every launch."
