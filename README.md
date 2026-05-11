@@ -57,14 +57,14 @@ The free app still supports app cleanup, protected app lists, restore sessions, 
 The latest installer and update files are available from the public `app-update-feeds` releases page.
 
 Installer download:
-- [justQuit.dmg](https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.09/justQuit.dmg)
-- [Windows x64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.0.06/justQuit-Setup-x64.exe)
-- [Windows ARM64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.0.06/justQuit-Setup-ARM64.exe)
+- [justQuit.dmg](https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.10/justQuit.dmg)
+- [Windows x64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.0.07/justQuit-Setup-x64.exe)
+- [Windows ARM64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.0.07/justQuit-Setup-ARM64.exe)
 
 One-line install command:
 
 ```bash
-curl -L https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.09/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
+curl -L https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.10/justQuit.dmg -o ~/Downloads/justQuit.dmg && open ~/Downloads/justQuit.dmg
 ```
 
 Updater feed:

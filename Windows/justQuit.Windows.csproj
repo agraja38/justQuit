@@ -9,9 +9,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>justQuit</AssemblyName>
     <RootNamespace>justQuit.Windows</RootNamespace>
-    <Version>1.0.06</Version>
-    <AssemblyVersion>1.0.6.0</AssemblyVersion>
-    <FileVersion>1.0.6.0</FileVersion>
+    <Version>1.0.07</Version>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <FileVersion>1.0.7.0</FileVersion>
     <Company>Agraja</Company>
     <Authors>Agraja</Authors>
     <Product>justQuit</Product>
