@@ -118,6 +118,7 @@ public sealed class AppModel : ObservableObject
                 OnPropertyChanged(nameof(ProBadgeText));
                 OnPropertyChanged(nameof(LicenseActionButtonText));
                 OnPropertyChanged(nameof(IsLicenseKeyEditable));
+                OnPropertyChanged(nameof(IsProBadgeVisible));
             }
         }
     }
@@ -240,7 +241,8 @@ public sealed class AppModel : ObservableObject
     public string VersionBadgeText => $"Version {CurrentVersion}";
     public string WindowTitle => $"justQuit {CurrentVersion}";
     public string FooterText => $"Created by Agraja · v{CurrentVersion}";
-    public string ProBadgeText => IsProUnlocked ? "Pro active" : "Pro";
+    public string ProBadgeText => IsProUnlocked ? "Pro" : string.Empty;
+    public bool IsProBadgeVisible => IsProUnlocked;
     public string LicenseActionButtonText => IsProUnlocked ? "Remove License" : "Activate";
     public bool IsLicenseKeyEditable => !IsProUnlocked;
     public string LicenseIdText => string.IsNullOrWhiteSpace(LicenseId) ? string.Empty : $"License ID: {LicenseId}";

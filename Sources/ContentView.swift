@@ -10,22 +10,41 @@ struct ContentView: View {
     @State private var selectedTab = 0
 
     var body: some View {
-        VStack(spacing: 0) {
-            TabView(selection: $selectedTab) {
-                mainTab
-                    .tabItem { Text("Apps") }
-                    .tag(0)
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                TabView(selection: $selectedTab) {
+                    mainTab
+                        .tabItem { Text("Apps") }
+                        .tag(0)
 
-                settingsTab
-                    .tabItem { Text("Settings") }
-                    .tag(1)
+                    settingsTab
+                        .tabItem { Text("Settings") }
+                        .tag(1)
 
-                profilesTab
-                    .tabItem { Text("Profiles") }
-                    .tag(2)
+                    profilesTab
+                        .tabItem { Text("Profiles") }
+                        .tag(2)
+                }
+                footer
+                    .padding(.bottom, 12)
             }
-            footer
-                .padding(.bottom, 12)
+
+            if model.isProUnlocked {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.seal.fill")
+                    Text("Pro")
+                }
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(
+                    Capsule()
+                        .fill(Color.accentColor)
+                )
+                .padding(.top, 10)
+                .padding(.trailing, 14)
+            }
         }
         .frame(minWidth: 760, minHeight: 690)
     }
@@ -270,7 +289,9 @@ struct ContentView: View {
                 StatBadge(icon: "lock.shield.fill", text: "Protected: \(model.regularApps.filter(model.isExcluded).count)")
                 StatBadge(icon: "eye.slash.fill", text: "Background skipped: \(model.menuBarApps.filter(model.isExcluded).count)")
                 StatBadge(icon: "checkmark.circle.fill", text: "Background included: \(model.menuBarApps.filter(model.shouldQuit).count)")
-                StatBadge(icon: "key.fill", text: model.proBadgeText)
+                if !model.isProUnlocked {
+                    StatBadge(icon: "key.fill", text: model.proBadgeText)
+                }
             }
             .font(.subheadline.weight(.medium))
         }

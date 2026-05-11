@@ -1,8 +1,8 @@
 {
-  "version": "1.2.11",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.11/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.11",
+  "version": "1.2.12",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.12/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.12",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1095550,
-  "notes": "Updates justQuit Pro license management with visible key entry, license ID display, and license removal."
+  "sizeBytes": 1122686,
+  "notes": "Adds a top-right Pro badge after license activation and keeps Mac and Windows at version 1.2.12."
 }

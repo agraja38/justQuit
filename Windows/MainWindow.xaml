@@ -27,12 +27,24 @@
                                 <TextBlock Margin="0,6,0,0" Foreground="#775A43" TextWrapping="Wrap"
                                            Text="Quit regular apps by default, and choose whether background apps stay skipped or get included too." />
                             </StackPanel>
-                            <Border DockPanel.Dock="Right" Margin="16,0,0,0" Padding="10,6" Background="#FFE6E0D4" CornerRadius="16" VerticalAlignment="Top">
-                                <StackPanel>
+                            <StackPanel DockPanel.Dock="Right" Margin="16,0,0,0" VerticalAlignment="Top">
+                                <Border Padding="10,6" Background="#FFE6E0D4" CornerRadius="16">
                                     <TextBlock Text="{Binding VersionBadgeText}" />
-                                    <TextBlock FontWeight="SemiBold" Text="{Binding ProBadgeText}" />
-                                </StackPanel>
-                            </Border>
+                                </Border>
+                                <Border Margin="0,8,0,0" Padding="12,7" Background="#FF2563EB" CornerRadius="16" HorizontalAlignment="Right">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsProBadgeVisible}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding ProBadgeText}" />
+                                </Border>
+                            </StackPanel>
                         </DockPanel>
 
                         <WrapPanel Margin="0,12,0,16">
