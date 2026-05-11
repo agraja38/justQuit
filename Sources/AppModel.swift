@@ -72,13 +72,52 @@ struct QuitSummary {
     }
 }
 
-struct UpdateFeed: Codable, Equatable {
+struct UpdateFeed: Decodable, Equatable {
     let version: String
     let downloadURL: String
     let releaseNotesURL: String?
     let minimumSystemVersion: String?
     let notes: String?
     let sizeBytes: Int64?
+
+    private enum CodingKeys: String, CodingKey {
+        case version
+        case downloadURL
+        case downloadUrl
+        case releaseNotesURL
+        case releaseNotesUrl
+        case minimumSystemVersion
+        case notes
+        case sizeBytes
+    }
+
+    init(
+        version: String,
+        downloadURL: String,
+        releaseNotesURL: String?,
+        minimumSystemVersion: String?,
+        notes: String?,
+        sizeBytes: Int64?
+    ) {
+        self.version = version
+        self.downloadURL = downloadURL
+        self.releaseNotesURL = releaseNotesURL
+        self.minimumSystemVersion = minimumSystemVersion
+        self.notes = notes
+        self.sizeBytes = sizeBytes
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decode(String.self, forKey: .version)
+        downloadURL = try container.decodeIfPresent(String.self, forKey: .downloadURL)
+            ?? container.decode(String.self, forKey: .downloadUrl)
+        releaseNotesURL = try container.decodeIfPresent(String.self, forKey: .releaseNotesURL)
+            ?? container.decodeIfPresent(String.self, forKey: .releaseNotesUrl)
+        minimumSystemVersion = try container.decodeIfPresent(String.self, forKey: .minimumSystemVersion)
+        notes = try container.decodeIfPresent(String.self, forKey: .notes)
+        sizeBytes = try container.decodeIfPresent(Int64.self, forKey: .sizeBytes)
+    }
 }
 
 struct RestoreSession: Codable, Equatable {

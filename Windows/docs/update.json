@@ -1,7 +1,7 @@
 {
-  "version": "1.2.09",
-  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.09/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.09",
+  "version": "1.2.10",
+  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.10/justQuit-Setup-x64.exe",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.10",
   "notes": "Adds justQuit Pro license activation and moves Windows source into the unified justQuit repo.",
   "sizeBytes": null
 }
