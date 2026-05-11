@@ -9,3 +9,7 @@ justQuit.iconset/
 apply_file_icon.swift
 AppBundle/Contents/MacOS/
 AppBundle/Contents/Resources/QuitKeeper.icns
+Windows/bin/
+Windows/obj/
+Windows/publish/
+Windows/installer/output/

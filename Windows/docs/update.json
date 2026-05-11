@@ -1,0 +1,7 @@
+{
+  "version": "1.0.06",
+  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.0.06/justQuit-Setup-x64.exe",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.0.06",
+  "notes": "Countdown now updates visibly in the tray and the countdown flow is fixed.",
+  "sizeBytes": null
+}

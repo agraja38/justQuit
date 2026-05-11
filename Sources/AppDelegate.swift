@@ -134,7 +134,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return
         }
 
-        if model.countdownEnabled && model.countdownSeconds > 0 {
+        if model.isProUnlocked && model.countdownEnabled && model.countdownSeconds > 0 {
             beginCountdown(seconds: model.countdownSeconds) { [weak self] in
                 self?.executeQuit()
             }
@@ -351,7 +351,7 @@ private final class StatusBarController: NSObject {
         button.target = self
         button.action = #selector(handleStatusItemClick)
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
-        applyIconStyle(model.menuBarIconStyle)
+        applyIconStyle(model.isProUnlocked ? model.menuBarIconStyle : .classicQ)
     }
 
     func setCountdownDisplay(seconds: Int) {
@@ -360,7 +360,7 @@ private final class StatusBarController: NSObject {
     }
 
     func clearCountdownDisplay() {
-        applyIconStyle(model.menuBarIconStyle)
+        applyIconStyle(model.isProUnlocked ? model.menuBarIconStyle : .classicQ)
     }
 
     func applyIconStyle(_ style: MenuBarIconStyle) {
@@ -389,7 +389,7 @@ private final class StatusBarController: NSObject {
         restoreItem.isEnabled = model.lastRestoreSession != nil
         menu.addItem(restoreItem)
 
-        if !model.profiles.isEmpty {
+        if model.isProUnlocked && !model.profiles.isEmpty {
             let profilesMenu = NSMenu()
             for profile in model.profiles {
                 let item = NSMenuItem(title: profile.name, action: #selector(applyProfileFromMenu), keyEquivalent: "")

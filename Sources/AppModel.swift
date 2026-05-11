@@ -130,6 +130,9 @@ final class AppModel: ObservableObject {
     @Published var launchAtLoginEnabled = false { didSet { persist() } }
     @Published var menuBarIconStyle: MenuBarIconStyle = .classicQ { didSet { persist() } }
     @Published var firstRunCompleted = false { didSet { persist() } }
+    @Published var licenseKey = "" { didSet { persist() } }
+    @Published private(set) var isProUnlocked = false
+    @Published private(set) var licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, custom menu bar icons, and profiles."
 
     @Published var statusMessage = "Ready"
     @Published var newProfileName = ""
@@ -184,6 +187,10 @@ final class AppModel: ObservableObject {
 
     var updateFeedURL: URL {
         URL(string: Self.builtInUpdateFeedURLString)!
+    }
+
+    var proBadgeText: String {
+        isProUnlocked ? "Pro active" : "Pro"
     }
 
     var updateStatusText: String {
@@ -352,10 +359,15 @@ final class AppModel: ObservableObject {
     }
 
     func shouldAskForConfirmation(appCount: Int) -> Bool {
-        confirmLargeQuitsEnabled && appCount >= confirmationThreshold
+        isProUnlocked && confirmLargeQuitsEnabled && appCount >= confirmationThreshold
     }
 
     func saveCurrentAsProfile() {
+        guard isProUnlocked else {
+            statusMessage = "Activate justQuit Pro to save profiles."
+            return
+        }
+
         let trimmedName = newProfileName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedName.isEmpty else {
             statusMessage = "Type a profile name first."
@@ -376,12 +388,22 @@ final class AppModel: ObservableObject {
     }
 
     func applyProfile(_ profile: QuitProfile) {
+        guard isProUnlocked else {
+            statusMessage = "Activate justQuit Pro to apply profiles."
+            return
+        }
+
         excludedBundleIdentifiers = Set(profile.excludedBundleIdentifiers)
         includedBackgroundBundleIdentifiers = Set(profile.includedBackgroundBundleIdentifiers)
         statusMessage = "Applied profile \(profile.name)."
     }
 
     func deleteProfile(_ profile: QuitProfile) {
+        guard isProUnlocked else {
+            statusMessage = "Activate justQuit Pro to manage profiles."
+            return
+        }
+
         profiles.removeAll { $0.id == profile.id }
         statusMessage = "Deleted profile \(profile.name)."
     }
@@ -486,6 +508,19 @@ final class AppModel: ObservableObject {
         firstRunCompleted = true
     }
 
+    func activateLicense() {
+        let result = LicenseService.validate(licenseKey)
+        isProUnlocked = result.isValid
+        licenseStatusMessage = result.message
+        statusMessage = result.message
+
+        if !result.isValid {
+            menuBarIconStyle = .classicQ
+        }
+
+        persist()
+    }
+
     private func startRefreshing() {
         refreshCancellable = Timer.publish(every: 3, on: .main, in: .common)
             .autoconnect()
@@ -506,6 +541,7 @@ final class AppModel: ObservableObject {
         notificationsEnabled = defaults.object(forKey: key("notificationsEnabled")) as? Bool ?? true
         hotkeyEnabled = defaults.object(forKey: key("hotkeyEnabled")) as? Bool ?? false
         launchAtLoginEnabled = defaults.object(forKey: key("launchAtLoginEnabled")) as? Bool ?? false
+        licenseKey = defaults.string(forKey: key("licenseKey")) ?? ""
         if let rawValue = defaults.string(forKey: key("menuBarIconStyle")),
            let storedStyle = MenuBarIconStyle(rawValue: rawValue) {
             menuBarIconStyle = storedStyle
@@ -523,6 +559,7 @@ final class AppModel: ObservableObject {
         }
 
         lastUpdateNotificationVersion = defaults.string(forKey: key("lastUpdateNotificationVersion"))
+        activateLicense()
     }
 
     private func persist() {
@@ -540,6 +577,7 @@ final class AppModel: ObservableObject {
         defaults.set(launchAtLoginEnabled, forKey: key("launchAtLoginEnabled"))
         defaults.set(menuBarIconStyle.rawValue, forKey: key("menuBarIconStyle"))
         defaults.set(firstRunCompleted, forKey: key("firstRunCompleted"))
+        defaults.set(licenseKey, forKey: key("licenseKey"))
 
         if let profilesData = try? JSONEncoder().encode(profiles) {
             defaults.set(profilesData, forKey: key("profiles"))

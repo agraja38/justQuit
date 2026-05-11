@@ -51,13 +51,15 @@ struct ContentView: View {
                         Toggle("Enable notifications", isOn: $model.notificationsEnabled)
                         Toggle("Enable global hotkey (\u{2303}\u{2325}Q)", isOn: $model.hotkeyEnabled)
                         Toggle("Confirm when quitting many apps", isOn: $model.confirmLargeQuitsEnabled)
+                            .disabled(!model.isProUnlocked)
                         Toggle("Enable countdown before quitting", isOn: $model.countdownEnabled)
+                            .disabled(!model.isProUnlocked)
 
-                        if model.confirmLargeQuitsEnabled {
+                        if model.isProUnlocked && model.confirmLargeQuitsEnabled {
                             Stepper("Confirm when quitting \(model.confirmationThreshold)+ apps", value: $model.confirmationThreshold, in: 1 ... 50)
                         }
 
-                        if model.countdownEnabled {
+                        if model.isProUnlocked && model.countdownEnabled {
                             Stepper("Countdown seconds: \(model.countdownSeconds)", value: $model.countdownSeconds, in: 1 ... 30)
                         }
 
@@ -66,9 +68,12 @@ struct ContentView: View {
                                 Text(style.title).tag(style)
                             }
                         }
+                        .disabled(!model.isProUnlocked)
                     }
                     .padding(.vertical, 8)
                 }
+
+                proLicenseBox
 
                 GroupBox("Recent Session Restore") {
                     VStack(alignment: .leading, spacing: 12) {
@@ -165,6 +170,10 @@ struct ContentView: View {
     private var profilesTab: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
+                if !model.isProUnlocked {
+                    proLicenseBox
+                }
+
                 GroupBox("Profiles") {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 10) {
@@ -175,6 +184,7 @@ struct ContentView: View {
                                 model.saveCurrentAsProfile()
                             }
                             .buttonStyle(.borderedProminent)
+                            .disabled(!model.isProUnlocked)
                         }
 
                         if model.profiles.isEmpty {
@@ -192,11 +202,13 @@ struct ContentView: View {
                                         model.applyProfile(profile)
                                     }
                                     .buttonStyle(.bordered)
+                                    .disabled(!model.isProUnlocked)
 
                                     Button("Delete") {
                                         model.deleteProfile(profile)
                                     }
                                     .buttonStyle(.bordered)
+                                    .disabled(!model.isProUnlocked)
                                 }
                                 .padding(.vertical, 2)
                             }
@@ -206,6 +218,26 @@ struct ContentView: View {
                 }
             }
             .padding(20)
+        }
+    }
+
+    private var proLicenseBox: some View {
+        GroupBox("justQuit Pro") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(model.licenseStatusMessage)
+                    .foregroundStyle(model.isProUnlocked ? .green : .secondary)
+
+                HStack(spacing: 10) {
+                    SecureField("License key", text: $model.licenseKey)
+                        .textFieldStyle(.roundedBorder)
+
+                    Button(model.isProUnlocked ? "Recheck" : "Activate") {
+                        model.activateLicense()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+            .padding(.vertical, 8)
         }
     }
 
@@ -222,6 +254,7 @@ struct ContentView: View {
                 StatBadge(icon: "lock.shield.fill", text: "Protected: \(model.regularApps.filter(model.isExcluded).count)")
                 StatBadge(icon: "eye.slash.fill", text: "Background skipped: \(model.menuBarApps.filter(model.isExcluded).count)")
                 StatBadge(icon: "checkmark.circle.fill", text: "Background included: \(model.menuBarApps.filter(model.shouldQuit).count)")
+                StatBadge(icon: "key.fill", text: model.proBadgeText)
             }
             .font(.subheadline.weight(.medium))
         }
