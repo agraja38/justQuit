@@ -3,6 +3,6 @@
   "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.10/justQuit.zip",
   "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.10",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1045597,
+  "sizeBytes": 1080180,
   "notes": "Adds justQuit Pro license activation and keeps Mac and Windows builds together in one repo."
 }
