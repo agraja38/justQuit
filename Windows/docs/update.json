@@ -1,7 +1,7 @@
 {
-  "version": "1.2.12",
-  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.12/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.12",
-  "notes": "Adds a top-right Pro badge after license activation and keeps Mac and Windows at version 1.2.12.",
+  "version": "1.2.13",
+  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.13/justQuit-Setup-x64.exe",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.13",
+  "notes": "Moves the top-right Pro badge higher after license activation and keeps Mac and Windows at version 1.2.13.",
   "sizeBytes": null
 }

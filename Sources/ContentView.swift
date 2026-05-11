@@ -42,7 +42,7 @@ struct ContentView: View {
                     Capsule()
                         .fill(Color.accentColor)
                 )
-                .padding(.top, 10)
+                .padding(.top, -4)
                 .padding(.trailing, 14)
             }
         }

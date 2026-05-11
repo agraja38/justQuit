@@ -28,10 +28,7 @@
                                            Text="Quit regular apps by default, and choose whether background apps stay skipped or get included too." />
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Margin="16,0,0,0" VerticalAlignment="Top">
-                                <Border Padding="10,6" Background="#FFE6E0D4" CornerRadius="16">
-                                    <TextBlock Text="{Binding VersionBadgeText}" />
-                                </Border>
-                                <Border Margin="0,8,0,0" Padding="12,7" Background="#FF2563EB" CornerRadius="16" HorizontalAlignment="Right">
+                                <Border Margin="0,-8,0,8" Padding="12,7" Background="#FF2563EB" CornerRadius="16" HorizontalAlignment="Right">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -43,6 +40,9 @@
                                         </Style>
                                     </Border.Style>
                                     <TextBlock Foreground="White" FontWeight="Bold" Text="{Binding ProBadgeText}" />
+                                </Border>
+                                <Border Padding="10,6" Background="#FFE6E0D4" CornerRadius="16">
+                                    <TextBlock Text="{Binding VersionBadgeText}" />
                                 </Border>
                             </StackPanel>
                         </DockPanel>
