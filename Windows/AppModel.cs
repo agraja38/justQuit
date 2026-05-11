@@ -25,6 +25,7 @@ public sealed class AppModel : ObservableObject
     private bool firstRunCompleted;
     private string licenseKey = string.Empty;
     private bool isProUnlocked;
+    private string licenseId = string.Empty;
     private string licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, and profiles.";
     private string statusMessage = "Ready";
     private string newProfileName = string.Empty;
@@ -115,6 +116,20 @@ public sealed class AppModel : ObservableObject
             if (SetProperty(ref isProUnlocked, value))
             {
                 OnPropertyChanged(nameof(ProBadgeText));
+                OnPropertyChanged(nameof(LicenseActionButtonText));
+                OnPropertyChanged(nameof(IsLicenseKeyEditable));
+            }
+        }
+    }
+
+    public string LicenseId
+    {
+        get => licenseId;
+        private set
+        {
+            if (SetProperty(ref licenseId, value))
+            {
+                OnPropertyChanged(nameof(LicenseIdText));
             }
         }
     }
@@ -226,6 +241,9 @@ public sealed class AppModel : ObservableObject
     public string WindowTitle => $"justQuit {CurrentVersion}";
     public string FooterText => $"Created by Agraja · v{CurrentVersion}";
     public string ProBadgeText => IsProUnlocked ? "Pro active" : "Pro";
+    public string LicenseActionButtonText => IsProUnlocked ? "Remove License" : "Activate";
+    public bool IsLicenseKeyEditable => !IsProUnlocked;
+    public string LicenseIdText => string.IsNullOrWhiteSpace(LicenseId) ? string.Empty : $"License ID: {LicenseId}";
 
     public string UpdateStatusText
     {
@@ -420,6 +438,7 @@ public sealed class AppModel : ObservableObject
         hotkeyEnabled = payload.HotkeyEnabled;
         launchAtLoginEnabled = payload.LaunchAtLoginEnabled;
         licenseKey = payload.LicenseKey;
+        LicenseId = string.Empty;
         updateFeedUrl = payload.UpdateFeedUrl;
         ActivateLicense();
         Persist();
@@ -443,8 +462,19 @@ public sealed class AppModel : ObservableObject
     {
         var result = LicenseService.Validate(LicenseKey);
         IsProUnlocked = result.IsValid;
+        LicenseId = result.LicenseId ?? string.Empty;
         LicenseStatusMessage = result.Message;
         StatusMessage = result.Message;
+        Persist();
+    }
+
+    public void RemoveLicense()
+    {
+        LicenseKey = string.Empty;
+        IsProUnlocked = false;
+        LicenseId = string.Empty;
+        LicenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, and profiles.";
+        StatusMessage = "justQuit Pro license removed.";
         Persist();
     }
 
@@ -483,6 +513,7 @@ public sealed class AppModel : ObservableObject
         launchAtLoginEnabled = settings.LaunchAtLoginEnabled;
         firstRunCompleted = settings.FirstRunCompleted;
         licenseKey = settings.LicenseKey;
+        licenseId = string.Empty;
         lastRestoreSession = settings.LastRestoreSession;
         updateFeedUrl = settings.UpdateFeedUrl;
         profiles.Clear();

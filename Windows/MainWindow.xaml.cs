@@ -22,7 +22,17 @@ public partial class MainWindow : Window
     private void CheckForUpdatesClicked(object sender, RoutedEventArgs e) => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty);
     private void InstallUpdateClicked(object sender, RoutedEventArgs e) => InstallUpdateRequested?.Invoke(this, EventArgs.Empty);
     private void SaveProfileClicked(object sender, RoutedEventArgs e) => Model.SaveCurrentAsProfile();
-    private void ActivateLicenseClicked(object sender, RoutedEventArgs e) => Model.ActivateLicense();
+    private void LicenseActionClicked(object sender, RoutedEventArgs e)
+    {
+        if (Model.IsProUnlocked)
+        {
+            Model.RemoveLicense();
+        }
+        else
+        {
+            Model.ActivateLicense();
+        }
+    }
 
     private void ExportSettingsClicked(object sender, RoutedEventArgs e)
     {

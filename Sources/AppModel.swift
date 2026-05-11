@@ -171,6 +171,7 @@ final class AppModel: ObservableObject {
     @Published var firstRunCompleted = false { didSet { persist() } }
     @Published var licenseKey = "" { didSet { persist() } }
     @Published private(set) var isProUnlocked = false
+    @Published private(set) var licenseID = ""
     @Published private(set) var licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, custom menu bar icons, and profiles."
 
     @Published var statusMessage = "Ready"
@@ -550,6 +551,7 @@ final class AppModel: ObservableObject {
     func activateLicense() {
         let result = LicenseService.validate(licenseKey)
         isProUnlocked = result.isValid
+        licenseID = result.licenseID ?? ""
         licenseStatusMessage = result.message
         statusMessage = result.message
 
@@ -557,6 +559,16 @@ final class AppModel: ObservableObject {
             menuBarIconStyle = .classicQ
         }
 
+        persist()
+    }
+
+    func removeLicense() {
+        licenseKey = ""
+        isProUnlocked = false
+        licenseID = ""
+        licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, custom menu bar icons, and profiles."
+        statusMessage = "justQuit Pro license removed."
+        menuBarIconStyle = .classicQ
         persist()
     }
 
@@ -581,6 +593,7 @@ final class AppModel: ObservableObject {
         hotkeyEnabled = defaults.object(forKey: key("hotkeyEnabled")) as? Bool ?? false
         launchAtLoginEnabled = defaults.object(forKey: key("launchAtLoginEnabled")) as? Bool ?? false
         licenseKey = defaults.string(forKey: key("licenseKey")) ?? ""
+        licenseID = defaults.string(forKey: key("licenseID")) ?? ""
         if let rawValue = defaults.string(forKey: key("menuBarIconStyle")),
            let storedStyle = MenuBarIconStyle(rawValue: rawValue) {
             menuBarIconStyle = storedStyle
@@ -617,6 +630,7 @@ final class AppModel: ObservableObject {
         defaults.set(menuBarIconStyle.rawValue, forKey: key("menuBarIconStyle"))
         defaults.set(firstRunCompleted, forKey: key("firstRunCompleted"))
         defaults.set(licenseKey, forKey: key("licenseKey"))
+        defaults.set(licenseID, forKey: key("licenseID"))
 
         if let profilesData = try? JSONEncoder().encode(profiles) {
             defaults.set(profilesData, forKey: key("profiles"))

@@ -171,7 +171,11 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 if !model.isProUnlocked {
-                    proLicenseBox
+                    GroupBox("justQuit Pro") {
+                        Text("Activate justQuit Pro in Settings to save and apply profiles.")
+                            .foregroundStyle(.secondary)
+                            .padding(.vertical, 8)
+                    }
                 }
 
                 GroupBox("Profiles") {
@@ -227,12 +231,24 @@ struct ContentView: View {
                 Text(model.licenseStatusMessage)
                     .foregroundStyle(model.isProUnlocked ? .green : .secondary)
 
-                HStack(spacing: 10) {
-                    SecureField("License key", text: $model.licenseKey)
-                        .textFieldStyle(.roundedBorder)
+                if model.isProUnlocked && !model.licenseID.isEmpty {
+                    Text("License ID: \(model.licenseID)")
+                        .font(.subheadline.weight(.semibold))
+                        .textSelection(.enabled)
+                }
 
-                    Button(model.isProUnlocked ? "Recheck" : "Activate") {
-                        model.activateLicense()
+                HStack(spacing: 10) {
+                    TextField("License key", text: $model.licenseKey)
+                        .textFieldStyle(.roundedBorder)
+                        .textSelection(.enabled)
+                        .disabled(model.isProUnlocked)
+
+                    Button(model.isProUnlocked ? "Remove License" : "Activate") {
+                        if model.isProUnlocked {
+                            model.removeLicense()
+                        } else {
+                            model.activateLicense()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                 }

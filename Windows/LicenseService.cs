@@ -3,7 +3,7 @@ using System.Text;
 
 namespace justQuit.Windows;
 
-public sealed record LicenseValidationResult(bool IsValid, string Message);
+public sealed record LicenseValidationResult(bool IsValid, string Message, string? LicenseId = null);
 
 public static class LicenseService
 {
@@ -52,7 +52,8 @@ public static class LicenseService
             return new LicenseValidationResult(false, "This license has an invalid issue date.");
         }
 
-        return new LicenseValidationResult(true, "justQuit Pro is active.");
+        var licenseId = $"JQPRO-{EncodeBase32(payload[4..])}";
+        return new LicenseValidationResult(true, "justQuit Pro is active.", licenseId);
     }
 
     private static byte[]? DecodeBase32(string value)
@@ -77,5 +78,31 @@ public static class LicenseService
         }
 
         return output.ToArray();
+    }
+
+    private static string EncodeBase32(byte[] data)
+    {
+        var buffer = 0;
+        var bitsInBuffer = 0;
+        var output = new StringBuilder();
+
+        foreach (var value in data)
+        {
+            buffer = (buffer << 8) | value;
+            bitsInBuffer += 8;
+
+            while (bitsInBuffer >= 5)
+            {
+                bitsInBuffer -= 5;
+                output.Append(Alphabet[(buffer >> bitsInBuffer) & 0b11111]);
+            }
+        }
+
+        if (bitsInBuffer > 0)
+        {
+            output.Append(Alphabet[(buffer << (5 - bitsInBuffer)) & 0b11111]);
+        }
+
+        return output.ToString();
     }
 }
