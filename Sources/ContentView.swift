@@ -10,41 +10,22 @@ struct ContentView: View {
     @State private var selectedTab = 0
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            VStack(spacing: 0) {
-                TabView(selection: $selectedTab) {
-                    mainTab
-                        .tabItem { Text("Apps") }
-                        .tag(0)
+        VStack(spacing: 0) {
+            TabView(selection: $selectedTab) {
+                mainTab
+                    .tabItem { Text("Apps") }
+                    .tag(0)
 
-                    settingsTab
-                        .tabItem { Text("Settings") }
-                        .tag(1)
+                settingsTab
+                    .tabItem { Text("Settings") }
+                    .tag(1)
 
-                    profilesTab
-                        .tabItem { Text("Profiles") }
-                        .tag(2)
-                }
-                footer
-                    .padding(.bottom, 12)
+                profilesTab
+                    .tabItem { Text("Profiles") }
+                    .tag(2)
             }
-
-            if model.isProUnlocked {
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.seal.fill")
-                    Text("Pro")
-                }
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .background(
-                    Capsule()
-                        .fill(Color.accentColor)
-                )
-                .padding(.top, -4)
-                .padding(.trailing, 14)
-            }
+            footer
+                .padding(.bottom, 12)
         }
         .frame(minWidth: 760, minHeight: 690)
     }
@@ -278,8 +259,27 @@ struct ContentView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("justQuit")
-                .font(.system(size: 30, weight: .bold))
+            HStack(alignment: .center) {
+                Text("justQuit")
+                    .font(.system(size: 30, weight: .bold))
+
+                Spacer()
+
+                if model.isProUnlocked {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.seal.fill")
+                        Text("Pro")
+                    }
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(
+                        Capsule()
+                            .fill(Color.accentColor)
+                    )
+                }
+            }
 
             Text("Quit regular apps by default, and choose whether menu bar or background apps stay skipped or get included too.")
                 .foregroundStyle(.secondary)

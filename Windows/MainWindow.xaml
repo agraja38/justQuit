@@ -28,7 +28,7 @@
                                            Text="Quit regular apps by default, and choose whether background apps stay skipped or get included too." />
                             </StackPanel>
                             <StackPanel DockPanel.Dock="Right" Margin="16,0,0,0" VerticalAlignment="Top">
-                                <Border Margin="0,-8,0,8" Padding="12,7" Background="#FF2563EB" CornerRadius="16" HorizontalAlignment="Right">
+                                <Border Margin="0,0,0,8" Padding="12,7" Background="#FF2563EB" CornerRadius="16" HorizontalAlignment="Right">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Setter Property="Visibility" Value="Collapsed" />
