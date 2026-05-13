@@ -1,8 +1,8 @@
 {
-  "version": "1.2.16",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.16/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.16",
+  "version": "1.2.17",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.17/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.17",
   "minimumSystemVersion": "13.0",
   "sizeBytes": 1116393,
-  "notes": "Improves Windows responsiveness by scanning running apps in the background and caching app icons."
+  "notes": "Fixes Windows update checks by clearing stale update state, avoiding cached feeds, and only showing Update Now when an update is ready."
 }

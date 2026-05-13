@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -12,7 +13,7 @@ public sealed class UpdateService
 {
     public const string DefaultFeedUrl = "https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit-windows/update.json";
 
-    private static readonly HttpClient HttpClient = new();
+    private static readonly HttpClient HttpClient = CreateHttpClient();
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -23,12 +24,13 @@ public sealed class UpdateService
         model.IsCheckingForUpdates = true;
         model.HasCheckedForUpdates = false;
         model.UpdateErrorMessage = string.Empty;
+        model.AvailableUpdate = null;
         model.AvailableUpdateSizeBytes = null;
         model.RaiseDerivedStateChanged();
 
         try
         {
-            var json = await HttpClient.GetStringAsync(model.UpdateFeedUrl);
+            var json = await GetStringNoCacheAsync(model.UpdateFeedUrl);
             var feed = JsonSerializer.Deserialize<UpdateFeed>(json, JsonOptions);
             if (feed is null)
             {
@@ -88,9 +90,18 @@ public sealed class UpdateService
             var downloadUrl = ResolveDownloadUrl(update.DownloadUrl);
             var installerPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(downloadUrl.LocalPath));
 
-            await using (var source = await HttpClient.GetStreamAsync(downloadUrl))
-            await using (var destination = File.Create(installerPath))
+            using (var response = await HttpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead))
             {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException(
+                        $"Download failed with {(int)response.StatusCode} ({response.ReasonPhrase}) for {downloadUrl}.",
+                        null,
+                        response.StatusCode);
+                }
+
+                await using var source = await response.Content.ReadAsStreamAsync();
+                await using var destination = File.Create(installerPath);
                 await source.CopyToAsync(destination);
             }
 
@@ -135,6 +146,28 @@ public sealed class UpdateService
         }
 
         return new Uri(resolved);
+    }
+
+    private static HttpClient CreateHttpClient()
+    {
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("justQuit-Windows-Updater/1.0");
+        client.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
+        client.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
+        return client;
+    }
+
+    private static async Task<string> GetStringNoCacheAsync(string url)
+    {
+        var builder = new UriBuilder(url);
+        var separator = string.IsNullOrEmpty(builder.Query) ? string.Empty : "&";
+        builder.Query = $"{builder.Query.TrimStart('?')}{separator}t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        using var request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
+        request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
+        request.Headers.Pragma.ParseAdd("no-cache");
+        using var response = await HttpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
     }
 
     private static string CreateUpdateLauncher(string installerPath)

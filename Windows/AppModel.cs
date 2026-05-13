@@ -159,7 +159,14 @@ public sealed class AppModel : ObservableObject
     public UpdateFeed? AvailableUpdate
     {
         get => availableUpdate;
-        set { if (SetProperty(ref availableUpdate, value)) RaiseDerivedStateChanged(); }
+        set
+        {
+            if (SetProperty(ref availableUpdate, value))
+            {
+                OnPropertyChanged(nameof(IsUpdateAvailable));
+                RaiseDerivedStateChanged();
+            }
+        }
     }
 
     public long? AvailableUpdateSizeBytes
@@ -264,6 +271,7 @@ public sealed class AppModel : ObservableObject
     public string AvailableUpdateVersionText => AvailableUpdate is null ? "No update available." : $"New version available: {AvailableUpdate.Version}";
     public string AvailableUpdateNotesText => AvailableUpdate?.Notes ?? string.Empty;
     public string AvailableUpdateSizeText => AvailableUpdateSizeBytes is null ? string.Empty : $"Update size: {FormatByteSize(AvailableUpdateSizeBytes.Value)}";
+    public bool IsUpdateAvailable => AvailableUpdate is not null;
     public string LastRestoreSummaryText => LastRestoreSession is null ? "No recent session yet." : $"{LastRestoreSession.Count} app(s) saved from {DescribeRelativeTime(LastRestoreSession.CreatedAt)}.";
     public bool CanRestoreLastSession => LastRestoreSession is not null && LastRestoreSession.ExecutablePaths.Count > 0;
 
@@ -526,6 +534,7 @@ public sealed class AppModel : ObservableObject
         OnPropertyChanged(nameof(AvailableUpdateVersionText));
         OnPropertyChanged(nameof(AvailableUpdateNotesText));
         OnPropertyChanged(nameof(AvailableUpdateSizeText));
+        OnPropertyChanged(nameof(IsUpdateAvailable));
         OnPropertyChanged(nameof(VersionBadgeText));
         OnPropertyChanged(nameof(WindowTitle));
         OnPropertyChanged(nameof(FooterText));
