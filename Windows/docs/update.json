@@ -1,7 +1,7 @@
 {
-  "version": "1.2.17",
-  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.17/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.17",
-  "notes": "Fixes Windows update checks by clearing stale update state, avoiding cached feeds, and only showing Update Now when an update is ready.",
+  "version": "1.2.18",
+  "downloadUrl": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.18/justQuit-Setup-x64.exe",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.18",
+  "notes": "Fixes Windows updates with verified 1.2.18 installer assets and fallback download URLs.",
   "sizeBytes": null
 }

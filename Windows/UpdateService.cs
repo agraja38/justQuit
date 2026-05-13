@@ -88,22 +88,7 @@ public sealed class UpdateService
         try
         {
             var downloadUrl = ResolveDownloadUrl(update.DownloadUrl);
-            var installerPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(downloadUrl.LocalPath));
-
-            using (var response = await HttpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new HttpRequestException(
-                        $"Download failed with {(int)response.StatusCode} ({response.ReasonPhrase}) for {downloadUrl}.",
-                        null,
-                        response.StatusCode);
-                }
-
-                await using var source = await response.Content.ReadAsStreamAsync();
-                await using var destination = File.Create(installerPath);
-                await source.CopyToAsync(destination);
-            }
+            var installerPath = await DownloadInstallerAsync(update, downloadUrl);
 
             model.StatusMessage = $"Installing update {update.Version}...";
             var launcherPath = CreateUpdateLauncher(installerPath);
@@ -146,6 +131,48 @@ public sealed class UpdateService
         }
 
         return new Uri(resolved);
+    }
+
+    private static async Task<string> DownloadInstallerAsync(UpdateFeed update, Uri primaryUrl)
+    {
+        Exception? lastError = null;
+        foreach (var downloadUrl in GetDownloadCandidates(update, primaryUrl))
+        {
+            try
+            {
+                var installerPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(downloadUrl.LocalPath));
+                using var response = await HttpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException(
+                        $"Download failed with {(int)response.StatusCode} ({response.ReasonPhrase}) for {downloadUrl}.",
+                        null,
+                        response.StatusCode);
+                }
+
+                await using var source = await response.Content.ReadAsStreamAsync();
+                await using var destination = File.Create(installerPath);
+                await source.CopyToAsync(destination);
+                return installerPath;
+            }
+            catch (Exception ex)
+            {
+                lastError = ex;
+            }
+        }
+
+        throw lastError ?? new InvalidOperationException("The update installer could not be downloaded.");
+    }
+
+    private static IEnumerable<Uri> GetDownloadCandidates(UpdateFeed update, Uri primaryUrl)
+    {
+        var installerName = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+            ? "justQuit-Setup-ARM64.exe"
+            : "justQuit-Setup-x64.exe";
+
+        yield return primaryUrl;
+        yield return new Uri($"https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v{update.Version}/{installerName}");
+        yield return new Uri($"https://github.com/agraja38/app-update-feeds/releases/latest/download/{installerName}");
     }
 
     private static HttpClient CreateHttpClient()
