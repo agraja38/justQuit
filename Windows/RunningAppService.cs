@@ -12,9 +12,14 @@ namespace justQuit.Windows;
 
 public sealed class RunningAppService
 {
+    private readonly Dictionary<string, ImageSource?> iconCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly object iconCacheLock = new();
+
     public IReadOnlyList<RunningAppInfo> GetRunningApps()
     {
         var currentProcessId = Environment.ProcessId;
+        using var currentProcess = Process.GetCurrentProcess();
+        var currentSessionId = currentProcess.SessionId;
         var windowsByProcess = EnumerateTopLevelWindows()
             .Where(window => window.ProcessId != currentProcessId)
             .GroupBy(window => window.ProcessId)
@@ -26,7 +31,7 @@ public sealed class RunningAppService
         {
             try
             {
-                if (process.SessionId != Process.GetCurrentProcess().SessionId || process.HasExited)
+                if (process.SessionId != currentSessionId || process.HasExited)
                 {
                     continue;
                 }
@@ -53,7 +58,7 @@ public sealed class RunningAppService
                     AppKey = appKey,
                     IdentifierText = identifierText,
                     ExecutablePath = executablePath,
-                    Icon = LoadAppIcon(executablePath),
+                    Icon = GetCachedIcon(executablePath),
                     IsBackgroundApp = !hasRegularWindow,
                     CanBeQuit = canBeQuit,
                 });
@@ -115,6 +120,30 @@ public sealed class RunningAppService
             {
             }
         }
+    }
+
+    private ImageSource? GetCachedIcon(string? executablePath)
+    {
+        if (string.IsNullOrWhiteSpace(executablePath))
+        {
+            return null;
+        }
+
+        lock (iconCacheLock)
+        {
+            if (iconCache.TryGetValue(executablePath, out var cachedIcon))
+            {
+                return cachedIcon;
+            }
+        }
+
+        var icon = LoadAppIcon(executablePath);
+        lock (iconCacheLock)
+        {
+            iconCache[executablePath] = icon;
+        }
+
+        return icon;
     }
 
     private static void TryCloseApp(int processId)

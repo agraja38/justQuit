@@ -17,7 +17,7 @@ public partial class MainWindow : Window
     private AppModel Model => (AppModel)DataContext;
 
     private void QuitAllClicked(object sender, RoutedEventArgs e) => QuitRequested?.Invoke(this, EventArgs.Empty);
-    private void RefreshClicked(object sender, RoutedEventArgs e) => Model.RefreshApps();
+    private async void RefreshClicked(object sender, RoutedEventArgs e) => await Model.RefreshAppsAsync();
     private void RestoreClicked(object sender, RoutedEventArgs e) => Model.RestoreLastSession();
     private void CheckForUpdatesClicked(object sender, RoutedEventArgs e) => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty);
     private void InstallUpdateClicked(object sender, RoutedEventArgs e) => InstallUpdateRequested?.Invoke(this, EventArgs.Empty);

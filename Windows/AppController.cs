@@ -31,7 +31,7 @@ public sealed class AppController : IDisposable
         {
             Interval = TimeSpan.FromSeconds(3),
         };
-        refreshTimer.Tick += (_, _) => model.RefreshApps();
+        refreshTimer.Tick += async (_, _) => await model.RefreshAppsAsync();
 
         countdownTimer = new DispatcherTimer
         {
@@ -67,7 +67,7 @@ public sealed class AppController : IDisposable
     public void Start(string[] args)
     {
         trayIconService.Start();
-        model.RefreshApps();
+        _ = model.RefreshAppsAsync();
         refreshTimer.Start();
         ApplyLaunchAtLogin();
         ApplyHotkey();
@@ -101,7 +101,7 @@ public sealed class AppController : IDisposable
 
     public void ShowMainWindow()
     {
-        model.RefreshApps();
+        _ = model.RefreshAppsAsync();
         if (!window.IsVisible)
         {
             window.Show();

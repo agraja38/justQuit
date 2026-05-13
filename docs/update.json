@@ -1,8 +1,8 @@
 {
-  "version": "1.2.15",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.15/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.15",
+  "version": "1.2.16",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.16/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.16",
   "minimumSystemVersion": "13.0",
   "sizeBytes": 1116393,
-  "notes": "Adds automated Windows installer builds and keeps Mac and Windows at version 1.2.15."
+  "notes": "Improves Windows responsiveness by scanning running apps in the background and caching app icons."
 }

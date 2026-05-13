@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using System.Windows.Threading;
 
 namespace justQuit.Windows;
 
@@ -13,6 +14,8 @@ public sealed class AppModel : ObservableObject
     private readonly ObservableCollection<RunningAppInfo> runningApps = [];
     private readonly ObservableCollection<QuitProfile> profiles = [];
 
+    private bool isRefreshingApps;
+    private bool refreshQueued;
     private HashSet<string> excludedAppKeys = [];
     private HashSet<string> includedBackgroundAppKeys = [];
     private bool confirmLargeQuitsEnabled = true;
@@ -283,11 +286,39 @@ public sealed class AppModel : ObservableObject
         RaiseDerivedStateChanged();
     }
 
-    public void RefreshApps()
+    public void RefreshApps() => _ = RefreshAppsAsync();
+
+    public async Task RefreshAppsAsync()
     {
-        runningApps.Clear();
-        foreach (var app in runningAppService.GetRunningApps()) runningApps.Add(app);
-        RaiseDerivedStateChanged();
+        if (isRefreshingApps)
+        {
+            refreshQueued = true;
+            return;
+        }
+
+        isRefreshingApps = true;
+        try
+        {
+            do
+            {
+                refreshQueued = false;
+                var apps = await Task.Run(runningAppService.GetRunningApps);
+                await App.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    ReplaceRunningApps(apps);
+                    RaiseDerivedStateChanged();
+                }, DispatcherPriority.Background);
+            }
+            while (refreshQueued);
+        }
+        catch
+        {
+            StatusMessage = "Could not refresh app list.";
+        }
+        finally
+        {
+            isRefreshingApps = false;
+        }
     }
 
     public QuitSummary? GetQuitSummary()
@@ -324,7 +355,7 @@ public sealed class AppModel : ObservableObject
         };
 
         StatusMessage = summary.Message;
-        Task.Delay(TimeSpan.FromSeconds(1.2)).ContinueWith(_ => App.Current.Dispatcher.Invoke(RefreshApps));
+        _ = RefreshAfterQuitAsync();
         return summary;
     }
 
@@ -554,6 +585,21 @@ public sealed class AppModel : ObservableObject
         ActionText = ProtectionActionText(app),
         CanToggle = !app.IsBackgroundApp || app.CanBeQuit,
     };
+
+    private void ReplaceRunningApps(IReadOnlyList<RunningAppInfo> apps)
+    {
+        runningApps.Clear();
+        foreach (var app in apps)
+        {
+            runningApps.Add(app);
+        }
+    }
+
+    private async Task RefreshAfterQuitAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(1.2));
+        await RefreshAppsAsync();
+    }
 
     private void SortProfiles()
     {
