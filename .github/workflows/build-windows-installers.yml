@@ -1,0 +1,60 @@
+name: Build Windows installers
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installers
+        shell: pwsh
+        run: ./Windows/build-installer.ps1
+
+      - name: Read version
+        id: version
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content ./Windows/justQuit.Windows.csproj
+          "value=$($project.Project.PropertyGroup.Version)" >> $env:GITHUB_OUTPUT
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: justQuit-Windows-${{ steps.version.outputs.value }}
+          path: |
+            Windows/installer/output/justQuit-Setup-x64.exe
+            Windows/installer/output/justQuit-Setup-ARM64.exe
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: windows-v${{ steps.version.outputs.value }}
+        run: |
+          $assets = @(
+            "Windows/installer/output/justQuit-Setup-x64.exe",
+            "Windows/installer/output/justQuit-Setup-ARM64.exe"
+          )
+
+          if (gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY 2>$null) {
+            gh release upload $env:RELEASE_TAG @assets --repo $env:GITHUB_REPOSITORY --clobber
+          } else {
+            gh release create $env:RELEASE_TAG @assets --repo $env:GITHUB_REPOSITORY --title "justQuit Windows v${{ steps.version.outputs.value }}" --notes "Windows installer assets for justQuit v${{ steps.version.outputs.value }}."
+          }

@@ -1,8 +1,8 @@
 {
-  "version": "1.2.14",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.14/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.14",
+  "version": "1.2.15",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.15/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.15",
   "minimumSystemVersion": "13.0",
   "sizeBytes": 1116393,
-  "notes": "Places the Pro badge in the app header and keeps Mac and Windows at version 1.2.14."
+  "notes": "Adds automated Windows installer builds and keeps Mac and Windows at version 1.2.15."
 }
