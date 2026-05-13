@@ -1,8 +1,8 @@
 {
-  "version": "1.2.18",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.18/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.18",
+  "version": "1.2.19",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.19/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.19",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1116394,
-  "notes": "Fixes Windows updates with verified 1.2.18 installer assets and fallback download URLs."
+  "sizeBytes": 1116395,
+  "notes": "Fixes Windows updates with stable direct installer URLs."
 }

@@ -128,6 +128,7 @@ public sealed class UpdateService
         if (RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
         {
             resolved = resolved.Replace("justQuit-Setup-x64.exe", "justQuit-Setup-ARM64.exe", StringComparison.OrdinalIgnoreCase);
+            resolved = resolved.Replace("justquit-setup-x64.exe", "justQuit-Setup-ARM64.exe", StringComparison.OrdinalIgnoreCase);
         }
 
         return new Uri(resolved);
@@ -171,6 +172,7 @@ public sealed class UpdateService
             : "justQuit-Setup-x64.exe";
 
         yield return primaryUrl;
+        yield return new Uri($"https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit-windows/{installerName}");
         yield return new Uri($"https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v{update.Version}/{installerName}");
         yield return new Uri($"https://github.com/agraja38/app-update-feeds/releases/latest/download/{installerName}");
     }
