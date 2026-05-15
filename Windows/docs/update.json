@@ -1,7 +1,7 @@
 {
-  "version": "1.2.19",
+  "version": "1.2.20",
   "downloadUrl": "https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit-windows/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.19",
-  "notes": "Fixes Windows updates with stable direct installer URLs.",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.20",
+  "notes": "Requires server activation for Pro license keys and binds each key to its allowed devices.",
   "sizeBytes": null
 }

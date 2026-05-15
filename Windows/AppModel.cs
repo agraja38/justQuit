@@ -481,7 +481,7 @@ public sealed class AppModel : ObservableObject
         licenseKey = payload.LicenseKey;
         LicenseId = string.Empty;
         updateFeedUrl = payload.UpdateFeedUrl;
-        ActivateLicense();
+        RestoreLicenseState();
         Persist();
         RaiseDerivedStateChanged();
         OnPropertyChanged(nameof(Profiles));
@@ -499,14 +499,25 @@ public sealed class AppModel : ObservableObject
 
     public void MarkOnboardingCompleted() => FirstRunCompleted = true;
 
-    public void ActivateLicense()
+    public async Task ActivateLicenseAsync()
     {
-        var result = LicenseService.Validate(LicenseKey);
+        StatusMessage = "Contacting the license server...";
+        var result = await LicenseService.ActivateAsync(LicenseKey);
+        ApplyLicenseResult(result);
+        Persist();
+    }
+
+    private void RestoreLicenseState()
+    {
+        ApplyLicenseResult(LicenseService.Validate(LicenseKey));
+    }
+
+    private void ApplyLicenseResult(LicenseValidationResult result)
+    {
         IsProUnlocked = result.IsValid;
         LicenseId = result.LicenseId ?? string.Empty;
         LicenseStatusMessage = result.Message;
         StatusMessage = result.Message;
-        Persist();
     }
 
     public void RemoveLicense()
@@ -560,7 +571,7 @@ public sealed class AppModel : ObservableObject
         updateFeedUrl = settings.UpdateFeedUrl;
         profiles.Clear();
         foreach (var profile in settings.Profiles) profiles.Add(profile);
-        ActivateLicense();
+        RestoreLicenseState();
     }
 
     private void Persist()

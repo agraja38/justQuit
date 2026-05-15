@@ -247,7 +247,9 @@ struct ContentView: View {
                         if model.isProUnlocked {
                             model.removeLicense()
                         } else {
-                            model.activateLicense()
+                            Task {
+                                await model.activateLicense()
+                            }
                         }
                     }
                     .buttonStyle(.borderedProminent)

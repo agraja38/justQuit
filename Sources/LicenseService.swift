@@ -12,7 +12,51 @@ enum LicenseService {
     private static let productCode: UInt8 = 2
     private static let editionCode: UInt8 = 1
     private static let signingSecret = "justquit-pro-license-secret"
+    private static let activationURL = URL(string: "https://license-key-generator-api.onrender.com/v1/activate")!
+    private static let deviceIDKey = "justQuit.licenseDeviceID"
     private static let epoch = Calendar(identifier: .gregorian).date(from: DateComponents(year: 2024, month: 1, day: 1))!
+
+    static func activate(_ licenseKey: String) async -> LicenseValidationResult {
+        let localResult = validate(licenseKey)
+        guard localResult.isValid else { return localResult }
+
+        do {
+            var request = URLRequest(url: activationURL)
+            request.httpMethod = "POST"
+            request.timeoutInterval = 20
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(
+                ActivationRequest(
+                    licenseKey: normalizedKey(from: licenseKey),
+                    deviceID: deviceID(),
+                    deviceName: Host.current().localizedName ?? "Mac",
+                    appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+                )
+            )
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return LicenseValidationResult(isValid: false, message: "The license server returned an invalid response.", licenseID: nil)
+            }
+
+            guard (200..<300).contains(httpResponse.statusCode) else {
+                return LicenseValidationResult(isValid: false, message: serverErrorMessage(from: data), licenseID: nil)
+            }
+
+            let activation = try JSONDecoder().decode(ActivationResponse.self, from: data)
+            return LicenseValidationResult(
+                isValid: true,
+                message: "justQuit Pro is active.",
+                licenseID: activation.licenseID.isEmpty ? localResult.licenseID : activation.licenseID
+            )
+        } catch {
+            return LicenseValidationResult(
+                isValid: false,
+                message: "Could not contact the license server. \(error.localizedDescription)",
+                licenseID: nil
+            )
+        }
+    }
 
     static func validate(_ licenseKey: String) -> LicenseValidationResult {
         guard !licenseKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -23,9 +67,7 @@ enum LicenseService {
             )
         }
 
-        let normalized = licenseKey
-            .uppercased()
-            .filter { alphabet.contains($0) }
+        let normalized = normalizedKey(from: licenseKey)
 
         guard let decoded = decodeBase32(normalized), decoded.count == 22 else {
             return LicenseValidationResult(isValid: false, message: "Enter a valid justQuit Pro license key.", licenseID: nil)
@@ -55,6 +97,37 @@ enum LicenseService {
 
         let licenseID = "JQPRO-\(encodeBase32(Array(payload.suffix(6))))"
         return LicenseValidationResult(isValid: true, message: "justQuit Pro is active.", licenseID: licenseID)
+    }
+
+    private static func normalizedKey(from licenseKey: String) -> String {
+        licenseKey
+            .uppercased()
+            .filter { alphabet.contains($0) }
+    }
+
+    private static func deviceID() -> String {
+        let defaults = UserDefaults.standard
+        if let storedID = defaults.string(forKey: deviceIDKey), !storedID.isEmpty {
+            return storedID
+        }
+
+        let newID = UUID().uuidString
+        defaults.set(newID, forKey: deviceIDKey)
+        return newID
+    }
+
+    private static func serverErrorMessage(from data: Data) -> String {
+        if let error = try? JSONDecoder().decode(ActivationError.self, from: data) {
+            switch error.detail {
+            case "license_not_issued":
+                return "This key was not found in the issued-license ledger."
+            case let detail where detail.hasPrefix("device_limit_reached"):
+                return "This license key has already been activated on its allowed device limit."
+            default:
+                return error.detail
+            }
+        }
+        return "The license server rejected this activation."
     }
 
     private static func decodeBase32(_ value: String) -> [UInt8]? {
@@ -100,4 +173,30 @@ enum LicenseService {
 
         return output
     }
+}
+
+private struct ActivationRequest: Encodable {
+    let licenseKey: String
+    let deviceID: String
+    let deviceName: String
+    let appVersion: String
+
+    private enum CodingKeys: String, CodingKey {
+        case licenseKey = "license_key"
+        case deviceID = "device_id"
+        case deviceName = "device_name"
+        case appVersion = "app_version"
+    }
+}
+
+private struct ActivationResponse: Decodable {
+    let licenseID: String
+
+    private enum CodingKeys: String, CodingKey {
+        case licenseID = "license_id"
+    }
+}
+
+private struct ActivationError: Decodable {
+    let detail: String
 }

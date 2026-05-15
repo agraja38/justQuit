@@ -548,8 +548,19 @@ final class AppModel: ObservableObject {
         firstRunCompleted = true
     }
 
-    func activateLicense() {
+    func activateLicense() async {
+        statusMessage = "Contacting the license server..."
+        let result = await LicenseService.activate(licenseKey)
+        applyLicenseResult(result)
+        persist()
+    }
+
+    private func restoreLicenseState() {
         let result = LicenseService.validate(licenseKey)
+        applyLicenseResult(result)
+    }
+
+    private func applyLicenseResult(_ result: LicenseValidationResult) {
         isProUnlocked = result.isValid
         licenseID = result.licenseID ?? ""
         licenseStatusMessage = result.message
@@ -558,8 +569,6 @@ final class AppModel: ObservableObject {
         if !result.isValid {
             menuBarIconStyle = .classicQ
         }
-
-        persist()
     }
 
     func removeLicense() {
@@ -611,7 +620,7 @@ final class AppModel: ObservableObject {
         }
 
         lastUpdateNotificationVersion = defaults.string(forKey: key("lastUpdateNotificationVersion"))
-        activateLicense()
+        restoreLicenseState()
     }
 
     private func persist() {

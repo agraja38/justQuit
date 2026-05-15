@@ -22,7 +22,7 @@ public partial class MainWindow : Window
     private void CheckForUpdatesClicked(object sender, RoutedEventArgs e) => CheckForUpdatesRequested?.Invoke(this, EventArgs.Empty);
     private void InstallUpdateClicked(object sender, RoutedEventArgs e) => InstallUpdateRequested?.Invoke(this, EventArgs.Empty);
     private void SaveProfileClicked(object sender, RoutedEventArgs e) => Model.SaveCurrentAsProfile();
-    private void LicenseActionClicked(object sender, RoutedEventArgs e)
+    private async void LicenseActionClicked(object sender, RoutedEventArgs e)
     {
         if (Model.IsProUnlocked)
         {
@@ -30,7 +30,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            Model.ActivateLicense();
+            await Model.ActivateLicenseAsync();
         }
     }
 
