@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Net.Http;
 
 namespace justQuit.Windows;
 
@@ -39,6 +40,11 @@ public static class LicenseService
                     "application/json"));
 
             var body = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return localResult;
+            }
+
             if (!response.IsSuccessStatusCode)
             {
                 return new LicenseValidationResult(false, ServerErrorMessage(body));

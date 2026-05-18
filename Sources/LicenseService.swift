@@ -39,6 +39,10 @@ enum LicenseService {
                 return LicenseValidationResult(isValid: false, message: "The license server returned an invalid response.", licenseID: nil)
             }
 
+            if httpResponse.statusCode == 404 {
+                return localResult
+            }
+
             guard (200..<300).contains(httpResponse.statusCode) else {
                 return LicenseValidationResult(isValid: false, message: serverErrorMessage(from: data), licenseID: nil)
             }
