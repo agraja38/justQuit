@@ -55,13 +55,13 @@ Generated installers:
 ## Publish a release
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\publish-release.ps1 -Version 1.2.21
+powershell -ExecutionPolicy Bypass -File .\publish-release.ps1 -Version 1.2.22
 ```
 
 ## Direct downloads
 
-- [Latest x64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.21/justQuit-Setup-x64.exe)
-- [Latest ARM64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.21/justQuit-Setup-ARM64.exe)
+- [Latest x64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.22/justQuit-Setup-x64.exe)
+- [Latest ARM64 installer](https://github.com/agraja38/app-update-feeds/releases/download/justquit-windows-v1.2.22/justQuit-Setup-ARM64.exe)
 
 ## Notes
 

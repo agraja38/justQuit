@@ -1,5 +1,5 @@
 #define MyAppName "justQuit"
-#define MyAppVersion "1.2.21"
+#define MyAppVersion "1.2.22"
 #define MyAppPublisher "Agraja"
 #define MyAppExeName "justQuit.exe"
 

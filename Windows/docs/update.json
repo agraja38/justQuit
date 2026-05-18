@@ -1,7 +1,7 @@
 {
-  "version": "1.2.21",
+  "version": "1.2.22",
   "downloadUrl": "https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit-windows/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.21",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.22",
   "notes": "Avoids 404 activation failures while the backend activation service is brought online.",
   "sizeBytes": null
 }
