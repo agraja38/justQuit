@@ -60,14 +60,18 @@ public sealed class TrayIconService : IDisposable
         ShowNotification("justQuit is running", "Created by Agraja. Left click the tray icon or use Ctrl+Alt+J.");
     }
 
-    public void UpdateProfiles(IReadOnlyList<QuitProfile> profiles)
+    public void UpdateProfiles(IReadOnlyList<QuitProfile> profiles, string appliedProfileId)
     {
         profilesItem.DropDownItems.Clear();
         profilesItem.Enabled = profiles.Count > 0;
 
         foreach (var profile in profiles)
         {
-            profilesItem.DropDownItems.Add(profile.Name, null, (_, _) => ProfileRequested?.Invoke(profile));
+            var item = new ToolStripMenuItem(profile.Name, null, (_, _) => ProfileRequested?.Invoke(profile))
+            {
+                Checked = string.Equals(profile.Name, appliedProfileId, StringComparison.OrdinalIgnoreCase),
+            };
+            profilesItem.DropDownItems.Add(item);
         }
     }
 

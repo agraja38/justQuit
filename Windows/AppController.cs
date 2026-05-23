@@ -71,7 +71,7 @@ public sealed class AppController : IDisposable
         refreshTimer.Start();
         ApplyLaunchAtLogin();
         ApplyHotkey();
-        trayIconService.UpdateProfiles(model.Profiles);
+        trayIconService.UpdateProfiles(model.Profiles, model.AppliedProfileId);
 
         _ = CheckForUpdatesAsync(true);
 
@@ -261,9 +261,9 @@ public sealed class AppController : IDisposable
         {
             ApplyLaunchAtLogin();
         }
-        else if (e.PropertyName is nameof(AppModel.Profiles))
+        else if (e.PropertyName is nameof(AppModel.Profiles) or nameof(AppModel.AppliedProfileId))
         {
-            trayIconService.UpdateProfiles(model.Profiles);
+            trayIconService.UpdateProfiles(model.Profiles, model.AppliedProfileId);
         }
     }
 }

@@ -395,6 +395,7 @@ private final class StatusBarController: NSObject {
                 let item = NSMenuItem(title: profile.name, action: #selector(applyProfileFromMenu), keyEquivalent: "")
                 item.target = self
                 item.representedObject = profile
+                item.state = profile.id == model.appliedProfileID ? .on : .off
                 profilesMenu.addItem(item)
             }
 

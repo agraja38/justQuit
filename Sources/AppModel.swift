@@ -173,6 +173,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var isProUnlocked = false
     @Published private(set) var licenseID = ""
     @Published private(set) var licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, custom menu bar icons, and profiles."
+    @Published private(set) var appliedProfileID = "" { didSet { persist() } }
 
     @Published var statusMessage = "Ready"
     @Published var newProfileName = ""
@@ -435,6 +436,7 @@ final class AppModel: ObservableObject {
 
         excludedBundleIdentifiers = Set(profile.excludedBundleIdentifiers)
         includedBackgroundBundleIdentifiers = Set(profile.includedBackgroundBundleIdentifiers)
+        appliedProfileID = profile.id
         statusMessage = "Applied profile \(profile.name)."
     }
 
@@ -445,6 +447,9 @@ final class AppModel: ObservableObject {
         }
 
         profiles.removeAll { $0.id == profile.id }
+        if appliedProfileID == profile.id {
+            appliedProfileID = ""
+        }
         statusMessage = "Deleted profile \(profile.name)."
     }
 
@@ -603,6 +608,7 @@ final class AppModel: ObservableObject {
         launchAtLoginEnabled = defaults.object(forKey: key("launchAtLoginEnabled")) as? Bool ?? false
         licenseKey = defaults.string(forKey: key("licenseKey")) ?? ""
         licenseID = defaults.string(forKey: key("licenseID")) ?? ""
+        appliedProfileID = defaults.string(forKey: key("appliedProfileID")) ?? ""
         if let rawValue = defaults.string(forKey: key("menuBarIconStyle")),
            let storedStyle = MenuBarIconStyle(rawValue: rawValue) {
             menuBarIconStyle = storedStyle
@@ -640,6 +646,7 @@ final class AppModel: ObservableObject {
         defaults.set(firstRunCompleted, forKey: key("firstRunCompleted"))
         defaults.set(licenseKey, forKey: key("licenseKey"))
         defaults.set(licenseID, forKey: key("licenseID"))
+        defaults.set(appliedProfileID, forKey: key("appliedProfileID"))
 
         if let profilesData = try? JSONEncoder().encode(profiles) {
             defaults.set(profilesData, forKey: key("profiles"))

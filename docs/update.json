@@ -1,8 +1,8 @@
 {
-  "version": "1.2.22",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.22/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.22",
+  "version": "1.2.23",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.23/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.23",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1149315,
-  "notes": "Avoids 404 activation failures while the backend activation service is brought online."
+  "sizeBytes": 1150962,
+  "notes": "Shows a check mark on the profile currently applied from the menu bar dropdown."
 }

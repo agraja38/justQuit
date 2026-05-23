@@ -85,6 +85,7 @@ public sealed class PersistedSettings
     public bool LaunchAtLoginEnabled { get; set; }
     public bool FirstRunCompleted { get; set; }
     public string LicenseKey { get; set; } = string.Empty;
+    public string AppliedProfileId { get; set; } = string.Empty;
     public string UpdateFeedUrl { get; set; } = UpdateService.DefaultFeedUrl;
     public RestoreSession? LastRestoreSession { get; set; }
 }

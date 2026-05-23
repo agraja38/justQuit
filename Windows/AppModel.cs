@@ -32,6 +32,7 @@ public sealed class AppModel : ObservableObject
     private string licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, and profiles.";
     private string statusMessage = "Ready";
     private string newProfileName = string.Empty;
+    private string appliedProfileId = string.Empty;
     private UpdateFeed? availableUpdate;
     private long? availableUpdateSizeBytes;
     private string updateErrorMessage = string.Empty;
@@ -154,6 +155,12 @@ public sealed class AppModel : ObservableObject
     {
         get => newProfileName;
         set => SetProperty(ref newProfileName, value);
+    }
+
+    public string AppliedProfileId
+    {
+        get => appliedProfileId;
+        private set { if (SetProperty(ref appliedProfileId, value)) Persist(); }
     }
 
     public UpdateFeed? AvailableUpdate
@@ -423,6 +430,7 @@ public sealed class AppModel : ObservableObject
 
         excludedAppKeys = profile.ExcludedAppKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
         includedBackgroundAppKeys = profile.IncludedBackgroundAppKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        AppliedProfileId = profile.Name;
         Persist();
         RaiseDerivedStateChanged();
         StatusMessage = $"Applied profile {profile.Name}.";
@@ -437,6 +445,10 @@ public sealed class AppModel : ObservableObject
         }
 
         profiles.Remove(profile);
+        if (string.Equals(AppliedProfileId, profile.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            AppliedProfileId = string.Empty;
+        }
         Persist();
         OnPropertyChanged(nameof(Profiles));
         StatusMessage = $"Deleted profile {profile.Name}.";
@@ -567,6 +579,7 @@ public sealed class AppModel : ObservableObject
         firstRunCompleted = settings.FirstRunCompleted;
         licenseKey = settings.LicenseKey;
         licenseId = string.Empty;
+        appliedProfileId = settings.AppliedProfileId;
         lastRestoreSession = settings.LastRestoreSession;
         updateFeedUrl = settings.UpdateFeedUrl;
         profiles.Clear();
@@ -590,6 +603,7 @@ public sealed class AppModel : ObservableObject
             LaunchAtLoginEnabled = LaunchAtLoginEnabled,
             FirstRunCompleted = FirstRunCompleted,
             LicenseKey = LicenseKey,
+            AppliedProfileId = AppliedProfileId,
             LastRestoreSession = LastRestoreSession,
             UpdateFeedUrl = UpdateFeedUrl,
         });
