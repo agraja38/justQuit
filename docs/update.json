@@ -1,8 +1,8 @@
 {
-  "version": "1.2.24",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.24/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.24",
+  "version": "1.2.25",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.25/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.25",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1188887,
-  "notes": "Shows the active profile prominently in the app and adds its short label to the menu bar icon."
+  "sizeBytes": 1188909,
+  "notes": "Uses white text for the macOS menu bar icon and active profile label."
 }

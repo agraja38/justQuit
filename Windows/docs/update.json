@@ -1,7 +1,7 @@
 {
-  "version": "1.2.24",
+  "version": "1.2.25",
   "downloadUrl": "https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit-windows/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.24",
-  "notes": "Shows the active profile prominently in the app and adds its short label to the tray icon.",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.25",
+  "notes": "Keeps the macOS and Windows release versions synchronized.",
   "sizeBytes": null
 }

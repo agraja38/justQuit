@@ -433,7 +433,7 @@ private final class StatusBarController: NSObject {
     private func title(for text: String, weight: NSFont.Weight) -> NSAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 15, weight: weight),
-            .foregroundColor: NSColor.labelColor
+            .foregroundColor: NSColor.white
         ]
         return NSAttributedString(string: text, attributes: attributes)
     }
@@ -453,7 +453,7 @@ private final class StatusBarController: NSObject {
             string: " \(model.appliedProfileIconLabel)",
             attributes: [
                 .font: NSFont.systemFont(ofSize: 9, weight: .bold),
-                .foregroundColor: NSColor.secondaryLabelColor,
+                .foregroundColor: NSColor.white,
                 .baselineOffset: -3
             ]
         )
