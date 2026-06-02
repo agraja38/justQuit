@@ -1,8 +1,8 @@
 {
-  "version": "1.2.23",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.23/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.23",
+  "version": "1.2.24",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.24/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.24",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1150962,
-  "notes": "Shows a check mark on the profile currently applied from the menu bar dropdown."
+  "sizeBytes": 1188887,
+  "notes": "Shows the active profile prominently in the app and adds its short label to the menu bar icon."
 }

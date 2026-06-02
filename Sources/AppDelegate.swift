@@ -103,6 +103,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self?.statusBarController?.applyIconStyle(style)
             }
             .store(in: &settingsCancellables)
+
+        model.$appliedProfileID
+            .sink { [weak self] _ in
+                self?.statusBarController?.refreshIcon()
+            }
+            .store(in: &settingsCancellables)
+
+        model.$profiles
+            .sink { [weak self] _ in
+                self?.statusBarController?.refreshIcon()
+            }
+            .store(in: &settingsCancellables)
     }
 
     private func applyLaunchAtLogin(_ enabled: Bool) {
@@ -360,6 +372,10 @@ private final class StatusBarController: NSObject {
     }
 
     func clearCountdownDisplay() {
+        refreshIcon()
+    }
+
+    func refreshIcon() {
         applyIconStyle(model.isProUnlocked ? model.menuBarIconStyle : .classicQ)
     }
 
@@ -371,11 +387,12 @@ private final class StatusBarController: NSObject {
 
         switch style {
         case .classicQ:
-            button.attributedTitle = title(for: "Q", weight: .bold)
+            button.attributedTitle = titleWithProfileLabel(for: "Q", weight: .bold)
         case .badgeQ:
             button.image = badgeImage(text: "Q")
+            button.attributedTitle = profileSubscript()
         case .compactJQ:
-            button.attributedTitle = title(for: "JQ", weight: .bold)
+            button.attributedTitle = titleWithProfileLabel(for: "JQ", weight: .bold)
         }
     }
 
@@ -419,6 +436,27 @@ private final class StatusBarController: NSObject {
             .foregroundColor: NSColor.labelColor
         ]
         return NSAttributedString(string: text, attributes: attributes)
+    }
+
+    private func titleWithProfileLabel(for text: String, weight: NSFont.Weight) -> NSAttributedString {
+        let result = NSMutableAttributedString(attributedString: title(for: text, weight: weight))
+        result.append(profileSubscript())
+        return result
+    }
+
+    private func profileSubscript() -> NSAttributedString {
+        guard !model.appliedProfileIconLabel.isEmpty else {
+            return NSAttributedString(string: "")
+        }
+
+        return NSAttributedString(
+            string: " \(model.appliedProfileIconLabel)",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 9, weight: .bold),
+                .foregroundColor: NSColor.secondaryLabelColor,
+                .baselineOffset: -3
+            ]
+        )
     }
 
     private func badgeImage(text: String) -> NSImage {

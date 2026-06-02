@@ -32,6 +32,7 @@ public sealed class AppModel : ObservableObject
     private string licenseStatusMessage = "Activate justQuit Pro to unlock countdowns, confirmation, and profiles.";
     private string statusMessage = "Ready";
     private string newProfileName = string.Empty;
+    private string newProfileMenuBarLabel = string.Empty;
     private string appliedProfileId = string.Empty;
     private UpdateFeed? availableUpdate;
     private long? availableUpdateSizeBytes;
@@ -157,10 +158,25 @@ public sealed class AppModel : ObservableObject
         set => SetProperty(ref newProfileName, value);
     }
 
+    public string NewProfileMenuBarLabel
+    {
+        get => newProfileMenuBarLabel;
+        set => SetProperty(ref newProfileMenuBarLabel, NormalizeProfileLabel(value));
+    }
+
     public string AppliedProfileId
     {
         get => appliedProfileId;
-        private set { if (SetProperty(ref appliedProfileId, value)) Persist(); }
+        private set
+        {
+            if (SetProperty(ref appliedProfileId, value))
+            {
+                OnPropertyChanged(nameof(AppliedProfileName));
+                OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
+                OnPropertyChanged(nameof(HasAppliedProfile));
+                Persist();
+            }
+        }
     }
 
     public UpdateFeed? AvailableUpdate
@@ -260,6 +276,11 @@ public sealed class AppModel : ObservableObject
     public string FooterText => $"Created by Agraja · v{CurrentVersion}";
     public string ProBadgeText => IsProUnlocked ? "Pro" : string.Empty;
     public bool IsProBadgeVisible => IsProUnlocked;
+    public string AppliedProfileName => profiles.FirstOrDefault(profile => string.Equals(profile.Name, AppliedProfileId, StringComparison.OrdinalIgnoreCase))?.Name ?? string.Empty;
+    public string AppliedProfileMenuBarLabel => profiles.FirstOrDefault(profile => string.Equals(profile.Name, AppliedProfileId, StringComparison.OrdinalIgnoreCase)) is { } profile
+        ? NormalizeProfileLabel(profile.MenuBarLabel, profile.Name)
+        : string.Empty;
+    public bool HasAppliedProfile => !string.IsNullOrWhiteSpace(AppliedProfileName);
     public string LicenseActionButtonText => IsProUnlocked ? "Remove License" : "Activate";
     public bool IsLicenseKeyEditable => !IsProUnlocked;
     public string LicenseIdText => string.IsNullOrWhiteSpace(LicenseId) ? string.Empty : $"License ID: {LicenseId}";
@@ -409,14 +430,19 @@ public sealed class AppModel : ObservableObject
         profiles.Add(new QuitProfile
         {
             Name = trimmedName,
+            MenuBarLabel = NormalizeProfileLabel(NewProfileMenuBarLabel, trimmedName),
             ExcludedAppKeys = excludedAppKeys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList(),
             IncludedBackgroundAppKeys = includedBackgroundAppKeys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList(),
         });
 
         SortProfiles();
         NewProfileName = string.Empty;
+        NewProfileMenuBarLabel = string.Empty;
         Persist();
         OnPropertyChanged(nameof(Profiles));
+        OnPropertyChanged(nameof(AppliedProfileName));
+        OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
+        OnPropertyChanged(nameof(HasAppliedProfile));
         StatusMessage = $"Saved profile {trimmedName}.";
     }
 
@@ -562,6 +588,9 @@ public sealed class AppModel : ObservableObject
         OnPropertyChanged(nameof(WindowTitle));
         OnPropertyChanged(nameof(FooterText));
         OnPropertyChanged(nameof(ProBadgeText));
+        OnPropertyChanged(nameof(AppliedProfileName));
+        OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
+        OnPropertyChanged(nameof(HasAppliedProfile));
     }
 
     private void LoadPreferences()
@@ -640,6 +669,13 @@ public sealed class AppModel : ObservableObject
         var ordered = profiles.OrderBy(profile => profile.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
         profiles.Clear();
         foreach (var profile in ordered) profiles.Add(profile);
+    }
+
+    private static string NormalizeProfileLabel(string? value, string fallbackName = "")
+    {
+        var trimmed = value?.Trim() ?? string.Empty;
+        var label = string.IsNullOrWhiteSpace(trimmed) ? fallbackName.Trim() : trimmed;
+        return string.Concat(label.Take(3)).ToUpperInvariant();
     }
 
     private static string DescribeRelativeTime(DateTime timestamp)

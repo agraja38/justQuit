@@ -72,6 +72,7 @@ public sealed class AppController : IDisposable
         ApplyLaunchAtLogin();
         ApplyHotkey();
         trayIconService.UpdateProfiles(model.Profiles, model.AppliedProfileId);
+        trayIconService.SetAppliedProfileLabel(model.AppliedProfileMenuBarLabel);
 
         _ = CheckForUpdatesAsync(true);
 
@@ -264,6 +265,7 @@ public sealed class AppController : IDisposable
         else if (e.PropertyName is nameof(AppModel.Profiles) or nameof(AppModel.AppliedProfileId))
         {
             trayIconService.UpdateProfiles(model.Profiles, model.AppliedProfileId);
+            trayIconService.SetAppliedProfileLabel(model.AppliedProfileMenuBarLabel);
         }
     }
 }

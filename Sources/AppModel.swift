@@ -38,10 +38,16 @@ struct RunningAppInfo: Identifiable, Hashable {
 
 struct QuitProfile: Codable, Identifiable, Hashable {
     let name: String
+    let menuBarLabel: String?
     let excludedBundleIdentifiers: [String]
     let includedBackgroundBundleIdentifiers: [String]
 
     var id: String { name }
+    var iconLabel: String {
+        let preferred = menuBarLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let fallback = String(name.prefix(1))
+        return String((preferred.isEmpty ? fallback : preferred).prefix(3)).uppercased()
+    }
 }
 
 struct ExportedSettings: Codable {
@@ -177,6 +183,7 @@ final class AppModel: ObservableObject {
 
     @Published var statusMessage = "Ready"
     @Published var newProfileName = ""
+    @Published var newProfileMenuBarLabel = ""
     @Published var availableUpdate: UpdateFeed?
     @Published var availableUpdateSizeBytes: Int64?
     @Published var updateErrorMessage = ""
@@ -204,6 +211,18 @@ final class AppModel: ObservableObject {
 
     var menuBarApps: [RunningAppInfo] {
         runningApps.filter(\.isMenuBarOrBackgroundApp)
+    }
+
+    var appliedProfile: QuitProfile? {
+        profiles.first { $0.id == appliedProfileID }
+    }
+
+    var appliedProfileName: String {
+        appliedProfile?.name ?? ""
+    }
+
+    var appliedProfileIconLabel: String {
+        appliedProfile?.iconLabel ?? ""
     }
 
     var quickToggleApps: [RunningAppInfo] {
@@ -417,6 +436,7 @@ final class AppModel: ObservableObject {
 
         let profile = QuitProfile(
             name: trimmedName,
+            menuBarLabel: normalizedProfileIconLabel(newProfileMenuBarLabel, fallbackName: trimmedName),
             excludedBundleIdentifiers: Array(excludedBundleIdentifiers).sorted(),
             includedBackgroundBundleIdentifiers: Array(includedBackgroundBundleIdentifiers).sorted()
         )
@@ -425,6 +445,7 @@ final class AppModel: ObservableObject {
         profiles.append(profile)
         profiles.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         newProfileName = ""
+        newProfileMenuBarLabel = ""
         statusMessage = "Saved profile \(profile.name)."
     }
 
@@ -661,6 +682,12 @@ final class AppModel: ObservableObject {
 
     private func key(_ suffix: String) -> String {
         defaultsPrefix + suffix
+    }
+
+    private func normalizedProfileIconLabel(_ label: String, fallbackName: String) -> String {
+        let trimmed = label.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fallback = String(fallbackName.prefix(1))
+        return String((trimmed.isEmpty ? fallback : trimmed).prefix(3)).uppercased()
     }
 
     private func isSystemVersionSatisfied(_ minimumVersion: String) -> Bool {

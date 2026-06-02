@@ -47,6 +47,26 @@
                             </StackPanel>
                         </DockPanel>
 
+                        <Border Margin="0,12,0,0" Padding="12,9" Background="#FFD5E8D4" CornerRadius="8">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasAppliedProfile}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="#FF166534" FontWeight="Bold" Text="Applied profile: " />
+                                <TextBlock Foreground="#FF166534" FontWeight="Bold" Text="{Binding AppliedProfileName}" />
+                                <Border Margin="10,0,0,0" Padding="7,2" Background="#FFB7DDB5" CornerRadius="8">
+                                    <TextBlock Foreground="#FF166534" FontWeight="Bold" Text="{Binding AppliedProfileMenuBarLabel}" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
                         <WrapPanel Margin="0,12,0,16">
                             <Border Margin="0,0,10,10" Padding="10,6" Background="#FFF1D9B5" CornerRadius="16">
                                 <TextBlock Text="{Binding AppsToQuitCount, StringFormat=Eligible now: {0} app(s)}" />
@@ -190,6 +210,7 @@
                             <StackPanel Margin="12">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                                     <TextBox Width="240" Margin="0,0,10,0" Padding="10,8" Text="{Binding NewProfileName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Width="90" Margin="0,0,10,0" Padding="10,8" MaxLength="3" ToolTip="Menu bar label, up to 3 characters" Text="{Binding NewProfileMenuBarLabel, UpdateSourceTrigger=PropertyChanged}" />
                                     <Button Width="120" Click="SaveProfileClicked" Content="Save Current" IsEnabled="{Binding IsProUnlocked}" />
                                 </StackPanel>
                                 <ItemsControl ItemsSource="{Binding Profiles}">
@@ -198,6 +219,7 @@
                                             <Border Margin="0,0,0,10" Padding="12" Background="White" CornerRadius="12" BorderBrush="#FFE3D7C7" BorderThickness="1">
                                                 <DockPanel>
                                                     <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Name}" />
+                                                    <TextBlock DockPanel.Dock="Left" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#775A43" FontWeight="Bold" Text="{Binding IconLabel}" />
                                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                                         <Button Width="70" Margin="0,0,10,0" Click="ApplyProfileClicked" Content="Apply" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
                                                         <Button Width="70" Click="DeleteProfileClicked" Content="Delete" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />

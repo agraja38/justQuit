@@ -34,6 +34,7 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
+                appliedProfileBanner
                 actionsBar
                 appsPanel(title: "Apps You Can Protect From Quitting", apps: filtered(model.regularApps), emptyText: "No regular apps are open right now.")
                 appsPanel(title: "Menu Bar and Background Apps", apps: filtered(model.menuBarApps), emptyText: "No menu bar or background apps detected.")
@@ -184,6 +185,13 @@ struct ContentView: View {
                             TextField("New profile name", text: $model.newProfileName)
                                 .textFieldStyle(.roundedBorder)
 
+                            TextField("Icon label", text: $model.newProfileMenuBarLabel)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 84)
+                                .onChange(of: model.newProfileMenuBarLabel) { value in
+                                    model.newProfileMenuBarLabel = String(value.prefix(3))
+                                }
+
                             Button("Save Current") {
                                 model.saveCurrentAsProfile()
                             }
@@ -199,6 +207,10 @@ struct ContentView: View {
                                 HStack {
                                     Text(profile.name)
                                         .font(.headline)
+
+                                    Text(profile.iconLabel)
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(.secondary)
 
                                     Spacer()
 
@@ -256,6 +268,30 @@ struct ContentView: View {
                 }
             }
             .padding(.vertical, 8)
+        }
+    }
+
+    @ViewBuilder
+    private var appliedProfileBanner: some View {
+        if let profile = model.appliedProfile {
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                Text("Applied profile:")
+                    .font(.subheadline.weight(.semibold))
+                Text(profile.name)
+                    .font(.headline)
+                Text(profile.iconLabel)
+                    .font(.caption.weight(.bold))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(.green.opacity(0.16))
+                    .clipShape(Capsule())
+                Spacer()
+            }
+            .padding(12)
+            .background(.green.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
 

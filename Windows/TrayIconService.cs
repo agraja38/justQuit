@@ -15,6 +15,8 @@ public sealed class TrayIconService : IDisposable
     private readonly Icon appIcon;
     private readonly ToolStripMenuItem countdownItem;
     private Icon? countdownIcon;
+    private Icon? profileIcon;
+    private string appliedProfileLabel = string.Empty;
 
     public TrayIconService(string versionText)
     {
@@ -80,6 +82,19 @@ public sealed class TrayIconService : IDisposable
         restoreItem.Enabled = isAvailable;
     }
 
+    public void SetAppliedProfileLabel(string label)
+    {
+        appliedProfileLabel = label;
+        profileIcon?.Dispose();
+        profileIcon = string.IsNullOrWhiteSpace(label) ? null : CreateBadgedIcon(label);
+        notifyIcon.Text = BuildTrayText();
+
+        if (!countdownItem.Visible)
+        {
+            notifyIcon.Icon = profileIcon ?? appIcon;
+        }
+    }
+
     public void ShowCountdown(int seconds)
     {
         countdownItem.Text = $"Countdown: {seconds}s";
@@ -95,7 +110,7 @@ public sealed class TrayIconService : IDisposable
     {
         countdownItem.Visible = false;
         notifyIcon.Text = BuildTrayText();
-        notifyIcon.Icon = appIcon;
+        notifyIcon.Icon = profileIcon ?? appIcon;
         countdownIcon?.Dispose();
         countdownIcon = null;
     }
@@ -112,6 +127,7 @@ public sealed class TrayIconService : IDisposable
         notifyIcon.Visible = false;
         notifyIcon.Dispose();
         countdownIcon?.Dispose();
+        profileIcon?.Dispose();
         appIcon.Dispose();
         menu.Dispose();
     }
@@ -145,10 +161,17 @@ public sealed class TrayIconService : IDisposable
 
     private string BuildTrayText()
     {
-        return $"justQuit v{versionText}";
+        return string.IsNullOrWhiteSpace(appliedProfileLabel)
+            ? $"justQuit v{versionText}"
+            : $"justQuit v{versionText} - profile {appliedProfileLabel}";
     }
 
     private Icon? CreateCountdownIcon(int seconds)
+    {
+        return CreateBadgedIcon(seconds.ToString());
+    }
+
+    private Icon? CreateBadgedIcon(string text)
     {
         try
         {
@@ -159,7 +182,7 @@ public sealed class TrayIconService : IDisposable
             var badgeRect = new Rectangle(bitmap.Width - 18, 0, 18, 18);
             using var badgeBrush = new SolidBrush(Color.FromArgb(220, 178, 45, 33));
             using var textBrush = new SolidBrush(Color.White);
-            using var font = new Font("Segoe UI", 8, FontStyle.Bold, GraphicsUnit.Pixel);
+            using var font = new Font("Segoe UI", text.Length > 2 ? 6 : 8, FontStyle.Bold, GraphicsUnit.Pixel);
             using var stringFormat = new StringFormat
             {
                 Alignment = StringAlignment.Center,
@@ -167,7 +190,7 @@ public sealed class TrayIconService : IDisposable
             };
 
             graphics.FillEllipse(badgeBrush, badgeRect);
-            graphics.DrawString(seconds.ToString(), font, textBrush, badgeRect, stringFormat);
+            graphics.DrawString(text, font, textBrush, badgeRect, stringFormat);
 
             var iconHandle = bitmap.GetHicon();
             using var tempIcon = Icon.FromHandle(iconHandle);

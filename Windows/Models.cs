@@ -1,5 +1,7 @@
 using System.Windows.Media;
 
+using System.Text.Json.Serialization;
+
 namespace justQuit.Windows;
 
 public sealed class RunningAppInfo
@@ -26,8 +28,19 @@ public sealed class RunningAppRow
 public sealed class QuitProfile
 {
     public required string Name { get; init; }
+    public string MenuBarLabel { get; init; } = string.Empty;
     public required List<string> ExcludedAppKeys { get; init; }
     public required List<string> IncludedBackgroundAppKeys { get; init; }
+
+    [JsonIgnore]
+    public string IconLabel
+    {
+        get
+        {
+            var preferred = string.IsNullOrWhiteSpace(MenuBarLabel) ? Name : MenuBarLabel;
+            return string.Concat(preferred.Trim().Take(3)).ToUpperInvariant();
+        }
+    }
 }
 
 public sealed class ExportedSettings
