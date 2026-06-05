@@ -461,6 +461,11 @@ final class AppModel: ObservableObject {
         statusMessage = "Applied profile \(profile.name)."
     }
 
+    func applyProfile(id profileID: String) {
+        guard let profile = profiles.first(where: { $0.id == profileID }) else { return }
+        applyProfile(profile)
+    }
+
     func deleteProfile(_ profile: QuitProfile) {
         guard isProUnlocked else {
             statusMessage = "Activate justQuit Pro to manage profiles."

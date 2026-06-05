@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 
 namespace justQuit.Windows;
 
@@ -82,6 +83,17 @@ public partial class MainWindow : Window
         {
             Model.ApplyProfile(profile);
         }
+    }
+
+    private void ApplyProfilePressed(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left)
+        {
+            return;
+        }
+
+        ApplyProfileClicked(sender, e);
+        e.Handled = true;
     }
 
     private void DeleteProfileClicked(object sender, RoutedEventArgs e)

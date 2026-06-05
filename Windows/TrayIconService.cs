@@ -17,6 +17,7 @@ public sealed class TrayIconService : IDisposable
     private Icon? countdownIcon;
     private Icon? profileIcon;
     private string appliedProfileLabel = string.Empty;
+    private bool suppressNextProfileClick;
 
     public TrayIconService(string versionText)
     {
@@ -69,9 +70,27 @@ public sealed class TrayIconService : IDisposable
 
         foreach (var profile in profiles)
         {
-            var item = new ToolStripMenuItem(profile.Name, null, (_, _) => ProfileRequested?.Invoke(profile))
+            var item = new ToolStripMenuItem(profile.Name)
             {
                 Checked = string.Equals(profile.Name, appliedProfileId, StringComparison.OrdinalIgnoreCase),
+            };
+            item.Click += (_, _) =>
+            {
+                if (suppressNextProfileClick)
+                {
+                    suppressNextProfileClick = false;
+                    return;
+                }
+
+                ProfileRequested?.Invoke(profile);
+            };
+            item.MouseDown += (_, e) =>
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    suppressNextProfileClick = true;
+                    ProfileRequested?.Invoke(profile);
+                }
             };
             profilesItem.DropDownItems.Add(item);
         }

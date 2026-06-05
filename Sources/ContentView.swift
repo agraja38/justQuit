@@ -215,7 +215,7 @@ struct ContentView: View {
                                     Spacer()
 
                                     Button("Apply") {
-                                        model.applyProfile(profile)
+                                        model.applyProfile(id: profile.id)
                                     }
                                     .buttonStyle(.bordered)
                                     .disabled(!model.isProUnlocked)

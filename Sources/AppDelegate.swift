@@ -283,6 +283,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 }
 
+extension StatusBarController: NSMenuDelegate {
+    func menuDidClose(_ menu: NSMenu) {
+        DispatchQueue.main.async { [weak self] in
+            if self?.statusItem.menu === menu {
+                self?.statusItem.menu = nil
+            }
+        }
+    }
+}
+
 private enum LaunchMode {
     case interactive
     case quitNow
@@ -348,8 +358,9 @@ private final class StatusBarController: NSObject {
     }
 
     @objc private func applyProfileFromMenu(_ sender: NSMenuItem) {
-        guard let profile = sender.representedObject as? QuitProfile else { return }
-        model.applyProfile(profile)
+        guard let profileID = sender.representedObject as? String else { return }
+        model.applyProfile(id: profileID)
+        refreshIcon()
     }
 
     @objc private func quitApp() {
@@ -398,6 +409,7 @@ private final class StatusBarController: NSObject {
 
     private func showContextMenu() {
         let menu = NSMenu()
+        menu.delegate = self
         menu.addItem(NSMenuItem(title: "Open justQuit", action: #selector(openGUIFromMenu), keyEquivalent: ""))
         let quitAllItem = NSMenuItem(title: "Quit All Eligible Apps", action: #selector(quitEverythingFromMenu), keyEquivalent: "q")
         quitAllItem.keyEquivalentModifierMask = [.control, .option]
@@ -411,7 +423,7 @@ private final class StatusBarController: NSObject {
             for profile in model.profiles {
                 let item = NSMenuItem(title: profile.name, action: #selector(applyProfileFromMenu), keyEquivalent: "")
                 item.target = self
-                item.representedObject = profile
+                item.representedObject = profile.id
                 item.state = profile.id == model.appliedProfileID ? .on : .off
                 profilesMenu.addItem(item)
             }
@@ -427,7 +439,6 @@ private final class StatusBarController: NSObject {
         menu.items.forEach { $0.target = $0.target ?? self }
         statusItem.menu = menu
         statusItem.button?.performClick(nil)
-        statusItem.menu = nil
     }
 
     private func title(for text: String, weight: NSFont.Weight) -> NSAttributedString {

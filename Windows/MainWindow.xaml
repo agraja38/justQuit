@@ -221,7 +221,7 @@
                                                     <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Name}" />
                                                     <TextBlock DockPanel.Dock="Left" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#775A43" FontWeight="Bold" Text="{Binding IconLabel}" />
                                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                        <Button Width="70" Margin="0,0,10,0" Click="ApplyProfileClicked" Content="Apply" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        <Button Width="70" Margin="0,0,10,0" Click="ApplyProfileClicked" PreviewMouseLeftButtonDown="ApplyProfilePressed" Content="Apply" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
                                                         <Button Width="70" Click="DeleteProfileClicked" Content="Delete" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
                                                     </StackPanel>
                                                 </DockPanel>
