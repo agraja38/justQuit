@@ -11,17 +11,17 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TabView(selection: $selectedTab) {
+TabView(selection: $selectedTab) {
                 mainTab
                     .tabItem { Text("Apps") }
                     .tag(0)
 
-                settingsTab
-                    .tabItem { Text("Settings") }
-                    .tag(1)
-
                 profilesTab
                     .tabItem { Text("Profiles") }
+                    .tag(1)
+
+                settingsTab
+                    .tabItem { Text("Settings") }
                     .tag(2)
             }
             footer
@@ -168,7 +168,7 @@ struct ContentView: View {
         }
     }
 
-    private var profilesTab: some View {
+private var profilesTab: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 if !model.isProUnlocked {
@@ -178,6 +178,8 @@ struct ContentView: View {
                             .padding(.vertical, 8)
                     }
                 }
+
+                appliedProfileBanner
 
                 GroupBox("Profiles") {
                     VStack(alignment: .leading, spacing: 12) {
@@ -193,6 +195,7 @@ struct ContentView: View {
                                 }
 
                             Button("Save Current") {
+                                clearProfileEditingFocus()
                                 model.saveCurrentAsProfile()
                             }
                             .buttonStyle(.borderedProminent)
@@ -205,6 +208,11 @@ struct ContentView: View {
                         } else {
                             ForEach(model.profiles) { profile in
                                 HStack {
+                                    if profile.id == model.appliedProfileID {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
+                                    }
+
                                     Text(profile.name)
                                         .font(.headline)
 
@@ -214,19 +222,27 @@ struct ContentView: View {
 
                                     Spacer()
 
-                                    Button("Apply") {
+Button(profile.id == model.appliedProfileID ? "Applied" : "Apply") {
+                                        clearProfileEditingFocus()
                                         model.applyProfile(id: profile.id)
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(.borderedProminent)
                                     .disabled(!model.isProUnlocked)
+                                    .onHover { hovering in
+                                        if hovering {
+                                            clearProfileEditingFocus()
+                                        }
+                                    }
 
                                     Button("Delete") {
+                                        clearProfileEditingFocus()
                                         model.deleteProfile(profile)
                                     }
                                     .buttonStyle(.bordered)
                                     .disabled(!model.isProUnlocked)
                                 }
                                 .padding(.vertical, 2)
+                                .contentShape(Rectangle())
                             }
                         }
                     }
@@ -235,6 +251,10 @@ struct ContentView: View {
             }
             .padding(20)
         }
+    }
+
+    private func clearProfileEditingFocus() {
+        NSApp.keyWindow?.makeFirstResponder(nil)
     }
 
     private var proLicenseBox: some View {

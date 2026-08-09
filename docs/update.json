@@ -1,8 +1,8 @@
 {
-  "version": "1.2.26",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.26/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.26",
+  "version": "1.2.27",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.27/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.27",
   "minimumSystemVersion": "13.0",
-  "sizeBytes": 1192520,
-  "notes": "Applies profiles with a single click from the app and menu bar."
+  "sizeBytes": 1207195,
+  "notes": "Applies profiles with one click in the app and reorders tabs to Apps, Profiles, Settings."
 }

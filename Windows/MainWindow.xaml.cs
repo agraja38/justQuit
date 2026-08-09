@@ -1,6 +1,4 @@
 using System.Windows;
-using System.Windows.Input;
-
 namespace justQuit.Windows;
 
 public partial class MainWindow : Window
@@ -79,26 +77,23 @@ public partial class MainWindow : Window
 
     private void ApplyProfileClicked(object sender, RoutedEventArgs e)
     {
-        if (((FrameworkElement)sender).DataContext is QuitProfile profile)
+        if (((FrameworkElement)sender).DataContext is ProfileRow row)
+        {
+            Model.ApplyProfile(row.Profile);
+        }
+        else if (((FrameworkElement)sender).DataContext is QuitProfile profile)
         {
             Model.ApplyProfile(profile);
         }
     }
 
-    private void ApplyProfilePressed(object sender, MouseButtonEventArgs e)
-    {
-        if (e.ChangedButton != MouseButton.Left)
-        {
-            return;
-        }
-
-        ApplyProfileClicked(sender, e);
-        e.Handled = true;
-    }
-
     private void DeleteProfileClicked(object sender, RoutedEventArgs e)
     {
-        if (((FrameworkElement)sender).DataContext is QuitProfile profile)
+        if (((FrameworkElement)sender).DataContext is ProfileRow row)
+        {
+            Model.DeleteProfile(row.Profile);
+        }
+        else if (((FrameworkElement)sender).DataContext is QuitProfile profile)
         {
             Model.DeleteProfile(profile);
         }

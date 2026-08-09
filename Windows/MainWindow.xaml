@@ -141,6 +141,69 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="Profiles">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="18">
+                        <Border Margin="0,0,0,12" Padding="12,9" Background="#FFD5E8D4" CornerRadius="8">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasAppliedProfile}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="#FF166534" FontWeight="Bold" Text="Applied profile: " />
+                                <TextBlock Foreground="#FF166534" FontWeight="Bold" Text="{Binding AppliedProfileName}" />
+                                <Border Margin="10,0,0,0" Padding="7,2" Background="#FFB7DDB5" CornerRadius="8">
+                                    <TextBlock Foreground="#FF166534" FontWeight="Bold" Text="{Binding AppliedProfileMenuBarLabel}" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                        <GroupBox Header="Profiles">
+                            <StackPanel Margin="12">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <TextBox Width="240" Margin="0,0,10,0" Padding="10,8" Text="{Binding NewProfileName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Width="90" Margin="0,0,10,0" Padding="10,8" MaxLength="3" ToolTip="Menu bar label, up to 3 characters" Text="{Binding NewProfileMenuBarLabel, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Width="120" Click="SaveProfileClicked" Content="Save Current" IsEnabled="{Binding IsProUnlocked}" />
+                                </StackPanel>
+                                <ItemsControl ItemsSource="{Binding ProfileRows}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="0,0,0,10" Padding="12" Background="White" CornerRadius="12" BorderBrush="#FFE3D7C7" BorderThickness="1">
+                                                <DockPanel>
+                                                    <TextBlock DockPanel.Dock="Left" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="#FF166534" FontWeight="Bold" Text="✓">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsApplied}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Name}" />
+                                                    <TextBlock DockPanel.Dock="Left" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#775A43" FontWeight="Bold" Text="{Binding IconLabel}" />
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <Button Width="80" Margin="0,0,10,0" Click="ApplyProfileClicked" ClickMode="Press" Content="{Binding ApplyButtonText}" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        <Button Width="70" Click="DeleteProfileClicked" Content="Delete" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="Settings">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="18">
@@ -203,37 +266,6 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Profiles">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="18">
-                        <GroupBox Header="Profiles">
-                            <StackPanel Margin="12">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                    <TextBox Width="240" Margin="0,0,10,0" Padding="10,8" Text="{Binding NewProfileName, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBox Width="90" Margin="0,0,10,0" Padding="10,8" MaxLength="3" ToolTip="Menu bar label, up to 3 characters" Text="{Binding NewProfileMenuBarLabel, UpdateSourceTrigger=PropertyChanged}" />
-                                    <Button Width="120" Click="SaveProfileClicked" Content="Save Current" IsEnabled="{Binding IsProUnlocked}" />
-                                </StackPanel>
-                                <ItemsControl ItemsSource="{Binding Profiles}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Margin="0,0,0,10" Padding="12" Background="White" CornerRadius="12" BorderBrush="#FFE3D7C7" BorderThickness="1">
-                                                <DockPanel>
-                                                    <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding Name}" />
-                                                    <TextBlock DockPanel.Dock="Left" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#775A43" FontWeight="Bold" Text="{Binding IconLabel}" />
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                        <Button Width="70" Margin="0,0,10,0" Click="ApplyProfileClicked" PreviewMouseLeftButtonDown="ApplyProfilePressed" Content="Apply" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
-                                                        <Button Width="70" Click="DeleteProfileClicked" Content="Delete" IsEnabled="{Binding DataContext.IsProUnlocked, RelativeSource={RelativeSource AncestorType=Window}}" />
-                                                    </StackPanel>
-                                                </DockPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
         </TabControl>
 
         <TextBlock Grid.Row="1" Margin="0,0,0,14" HorizontalAlignment="Center" Foreground="#775A43" FontWeight="SemiBold" Text="{Binding FooterText}" />

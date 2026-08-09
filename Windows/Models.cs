@@ -25,6 +25,15 @@ public sealed class RunningAppRow
     public required bool CanToggle { get; init; }
 }
 
+public sealed class ProfileRow
+{
+    public required QuitProfile Profile { get; init; }
+    public required string Name { get; init; }
+    public required string IconLabel { get; init; }
+    public required bool IsApplied { get; init; }
+    public string ApplyButtonText => IsApplied ? "Applied" : "Apply";
+}
+
 public sealed class QuitProfile
 {
     public required string Name { get; init; }

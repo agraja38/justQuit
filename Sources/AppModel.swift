@@ -449,21 +449,32 @@ final class AppModel: ObservableObject {
         statusMessage = "Saved profile \(profile.name)."
     }
 
-    func applyProfile(_ profile: QuitProfile) {
+func applyProfile(_ profile: QuitProfile) {
         guard isProUnlocked else {
             statusMessage = "Activate justQuit Pro to apply profiles."
             return
         }
 
+        // Mark as applied first so the Profiles tab shows the selection immediately,
+        // then update exclusion lists and persist once.
+        let wasLoading = isLoading
+        isLoading = true
+        appliedProfileID = profile.id
         excludedBundleIdentifiers = Set(profile.excludedBundleIdentifiers)
         includedBackgroundBundleIdentifiers = Set(profile.includedBackgroundBundleIdentifiers)
-        appliedProfileID = profile.id
         statusMessage = "Applied profile \(profile.name)."
+        isLoading = wasLoading
+        persist()
     }
 
     func applyProfile(id profileID: String) {
-        guard let profile = profiles.first(where: { $0.id == profileID }) else { return }
+        guard let profile = profiles.first(where: { $0.id.caseInsensitiveCompare(profileID) == .orderedSame }) else { return }
         applyProfile(profile)
+    }
+
+    func applyProfileFromApp(id profileID: String) {
+        NSApp.keyWindow?.makeFirstResponder(nil)
+        applyProfile(id: profileID)
     }
 
     func deleteProfile(_ profile: QuitProfile) {

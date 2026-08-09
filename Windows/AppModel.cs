@@ -51,6 +51,7 @@ public sealed class AppModel : ObservableObject
 
     public ObservableCollection<RunningAppInfo> RunningApps => runningApps;
     public IReadOnlyList<QuitProfile> Profiles => profiles;
+    public IEnumerable<ProfileRow> ProfileRows => profiles.Select(ToProfileRow);
     public IEnumerable<RunningAppRow> RegularApps => runningApps.Where(app => !app.IsBackgroundApp).Where(AppMatchesSearch).Select(ToRow);
     public IEnumerable<RunningAppRow> BackgroundApps => runningApps.Where(app => app.IsBackgroundApp).Where(AppMatchesSearch).Select(ToRow);
     public IEnumerable<RunningAppInfo> AppsToQuit => runningApps.Where(ShouldQuit);
@@ -440,6 +441,7 @@ public sealed class AppModel : ObservableObject
         NewProfileMenuBarLabel = string.Empty;
         Persist();
         OnPropertyChanged(nameof(Profiles));
+        OnPropertyChanged(nameof(ProfileRows));
         OnPropertyChanged(nameof(AppliedProfileName));
         OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
         OnPropertyChanged(nameof(HasAppliedProfile));
@@ -456,8 +458,12 @@ public sealed class AppModel : ObservableObject
 
         excludedAppKeys = profile.ExcludedAppKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
         includedBackgroundAppKeys = profile.IncludedBackgroundAppKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        AppliedProfileId = profile.Name;
+        appliedProfileId = profile.Name;
         Persist();
+        OnPropertyChanged(nameof(AppliedProfileId));
+        OnPropertyChanged(nameof(AppliedProfileName));
+        OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
+        OnPropertyChanged(nameof(HasAppliedProfile));
         RaiseDerivedStateChanged();
         StatusMessage = $"Applied profile {profile.Name}.";
     }
@@ -477,6 +483,7 @@ public sealed class AppModel : ObservableObject
         }
         Persist();
         OnPropertyChanged(nameof(Profiles));
+        OnPropertyChanged(nameof(ProfileRows));
         StatusMessage = $"Deleted profile {profile.Name}.";
     }
 
@@ -523,6 +530,7 @@ public sealed class AppModel : ObservableObject
         Persist();
         RaiseDerivedStateChanged();
         OnPropertyChanged(nameof(Profiles));
+        OnPropertyChanged(nameof(ProfileRows));
         OnPropertyChanged(nameof(ConfirmLargeQuitsEnabled));
         OnPropertyChanged(nameof(ConfirmationThreshold));
         OnPropertyChanged(nameof(CountdownEnabled));
@@ -591,6 +599,7 @@ public sealed class AppModel : ObservableObject
         OnPropertyChanged(nameof(AppliedProfileName));
         OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
         OnPropertyChanged(nameof(HasAppliedProfile));
+        OnPropertyChanged(nameof(ProfileRows));
     }
 
     private void LoadPreferences()
@@ -648,6 +657,19 @@ public sealed class AppModel : ObservableObject
         ActionText = ProtectionActionText(app),
         CanToggle = !app.IsBackgroundApp || app.CanBeQuit,
     };
+
+    private ProfileRow ToProfileRow(QuitProfile profile)
+    {
+        var isApplied = string.Equals(profile.Name, AppliedProfileId, StringComparison.OrdinalIgnoreCase);
+        return new ProfileRow
+        {
+            Profile = profile,
+            Name = profile.Name,
+            IconLabel = profile.IconLabel,
+            IsApplied = isApplied,
+            ApplyButtonText = isApplied ? "Applied" : "Apply",
+        };
+    }
 
     private void ReplaceRunningApps(IReadOnlyList<RunningAppInfo> apps)
     {
