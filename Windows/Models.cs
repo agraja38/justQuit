@@ -31,7 +31,7 @@ public sealed class ProfileRow
     public required string Name { get; init; }
     public required string IconLabel { get; init; }
     public required bool IsApplied { get; init; }
-    public string ApplyButtonText => IsApplied ? "Applied" : "Apply";
+    public required string ApplyButtonText { get; init; }
 }
 
 public sealed class QuitProfile
