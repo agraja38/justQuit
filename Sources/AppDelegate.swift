@@ -106,13 +106,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         model.$appliedProfileID
             .sink { [weak self] _ in
-                self?.statusBarController?.refreshIcon()
+                DispatchQueue.main.async {
+                    self?.statusBarController?.refreshIcon()
+                }
             }
             .store(in: &settingsCancellables)
 
         model.$profiles
             .sink { [weak self] _ in
-                self?.statusBarController?.refreshIcon()
+                DispatchQueue.main.async {
+                    self?.statusBarController?.refreshIcon()
+                }
             }
             .store(in: &settingsCancellables)
     }

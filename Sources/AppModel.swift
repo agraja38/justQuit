@@ -449,7 +449,7 @@ final class AppModel: ObservableObject {
         statusMessage = "Saved profile \(profile.name)."
     }
 
-func applyProfile(_ profile: QuitProfile) {
+    func applyProfile(_ profile: QuitProfile) {
         guard isProUnlocked else {
             statusMessage = "Activate justQuit Pro to apply profiles."
             return
@@ -470,11 +470,6 @@ func applyProfile(_ profile: QuitProfile) {
     func applyProfile(id profileID: String) {
         guard let profile = profiles.first(where: { $0.id.caseInsensitiveCompare(profileID) == .orderedSame }) else { return }
         applyProfile(profile)
-    }
-
-    func applyProfileFromApp(id profileID: String) {
-        NSApp.keyWindow?.makeFirstResponder(nil)
-        applyProfile(id: profileID)
     }
 
     func deleteProfile(_ profile: QuitProfile) {

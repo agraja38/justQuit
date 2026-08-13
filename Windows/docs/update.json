@@ -1,7 +1,7 @@
 {
-  "version": "1.2.27",
+  "version": "1.2.28",
   "downloadUrl": "https://raw.githubusercontent.com/agraja38/app-update-feeds/main/justquit-windows/justQuit-Setup-x64.exe",
-  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.27",
-  "notes": "Applies profiles with one click in the app and reorders tabs to Apps, Profiles, Settings.",
+  "releaseNotesUrl": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-windows-v1.2.28",
+  "notes": "Applies profiles on the first click and refreshes the tray icon immediately.",
   "sizeBytes": null
 }

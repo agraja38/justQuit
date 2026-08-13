@@ -175,6 +175,7 @@ public sealed class AppModel : ObservableObject
                 OnPropertyChanged(nameof(AppliedProfileName));
                 OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
                 OnPropertyChanged(nameof(HasAppliedProfile));
+                OnPropertyChanged(nameof(ProfileRows));
                 Persist();
             }
         }
@@ -458,12 +459,7 @@ public sealed class AppModel : ObservableObject
 
         excludedAppKeys = profile.ExcludedAppKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
         includedBackgroundAppKeys = profile.IncludedBackgroundAppKeys.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        appliedProfileId = profile.Name;
-        Persist();
-        OnPropertyChanged(nameof(AppliedProfileId));
-        OnPropertyChanged(nameof(AppliedProfileName));
-        OnPropertyChanged(nameof(AppliedProfileMenuBarLabel));
-        OnPropertyChanged(nameof(HasAppliedProfile));
+        AppliedProfileId = profile.Name;
         RaiseDerivedStateChanged();
         StatusMessage = $"Applied profile {profile.Name}.";
     }

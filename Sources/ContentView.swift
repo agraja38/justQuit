@@ -222,17 +222,11 @@ private var profilesTab: some View {
 
                                     Spacer()
 
-Button(profile.id == model.appliedProfileID ? "Applied" : "Apply") {
-                                        clearProfileEditingFocus()
+                                    Button(profile.id == model.appliedProfileID ? "Applied" : "Apply") {
                                         model.applyProfile(id: profile.id)
                                     }
                                     .buttonStyle(.borderedProminent)
                                     .disabled(!model.isProUnlocked)
-                                    .onHover { hovering in
-                                        if hovering {
-                                            clearProfileEditingFocus()
-                                        }
-                                    }
 
                                     Button("Delete") {
                                         clearProfileEditingFocus()
