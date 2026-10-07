@@ -1,8 +1,8 @@
 {
-  "version": "1.2.28",
-  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.28/justQuit.zip",
-  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.28",
+  "version": "1.2.29",
+  "downloadURL": "https://github.com/agraja38/app-update-feeds/releases/download/justquit-v1.2.29/justQuit.zip",
+  "releaseNotesURL": "https://github.com/agraja38/app-update-feeds/releases/tag/justquit-v1.2.29",
   "minimumSystemVersion": "13.0",
   "sizeBytes": null,
-  "notes": "Applies profiles on the first click and refreshes the menu bar icon immediately."
+  "notes": "Makes the macOS menu bar icon adapt automatically to the wallpaper and menu bar appearance."
 }

@@ -447,8 +447,7 @@ private final class StatusBarController: NSObject {
 
     private func title(for text: String, weight: NSFont.Weight) -> NSAttributedString {
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 15, weight: weight),
-            .foregroundColor: NSColor.white
+            .font: NSFont.systemFont(ofSize: 15, weight: weight)
         ]
         return NSAttributedString(string: text, attributes: attributes)
     }
@@ -468,7 +467,6 @@ private final class StatusBarController: NSObject {
             string: " \(model.appliedProfileIconLabel)",
             attributes: [
                 .font: NSFont.systemFont(ofSize: 9, weight: .bold),
-                .foregroundColor: NSColor.white,
                 .baselineOffset: -3
             ]
         )
@@ -480,22 +478,24 @@ private final class StatusBarController: NSObject {
         image.lockFocus()
 
         let circleRect = NSRect(x: 1, y: 1, width: 16, height: 16)
-        NSColor.labelColor.setFill()
-        NSBezierPath(ovalIn: circleRect).fill()
+        NSColor.black.setStroke()
+        let circle = NSBezierPath(ovalIn: circleRect)
+        circle.lineWidth = 1.5
+        circle.stroke()
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
 
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 11, weight: .bold),
-            .foregroundColor: NSColor.controlBackgroundColor,
+            .foregroundColor: NSColor.black,
             .paragraphStyle: paragraphStyle
         ]
 
         let textRect = NSRect(x: 0, y: 2, width: size.width, height: 12)
         text.draw(in: textRect, withAttributes: attributes)
         image.unlockFocus()
-        image.isTemplate = false
+        image.isTemplate = true
         return image
     }
 }
